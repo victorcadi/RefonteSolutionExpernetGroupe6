@@ -1,0 +1,34 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: refonte-expernet
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_dev_password
+      MYSQL_DATABASE: db_refonte_expernet
+      MYSQL_USER: usr_expernet
+      MYSQL_PASSWORD: app_dev_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uusr_expernet", "-papp_dev_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+
+  flyway:
+    image: flyway/flyway:13.10.3
+    command: ["-configFiles=/flyway/conf/flyway.conf", "migrate"]
+    volumes:
+      - ../sql:/flyway/sql
+      - ../flyway.conf:/flyway/conf/flyway.conf:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

@@ -1,0 +1,2 @@
+ALTER TABLE Utilisateur
+    ADD COLUMN MotDePasse VARCHAR(255) NULL;
