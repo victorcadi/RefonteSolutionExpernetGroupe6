@@ -4,9 +4,12 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+
 #[ORM\Entity]
 #[ORM\Table(name: 'Utilisateur')]
-class Utilisateur
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -115,6 +118,44 @@ class Utilisateur
     {
         $this->formation = $formation;
         return $this;
+    }
+
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email ?? '';
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->motDePasse;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->motDePasse = $password;
+
+        return $this;
+    }
+
+    public function getRoles(): array
+    {
+        $role = match ($this->role) {
+            'Admin' => 'ROLE_ADMIN',
+            'Formateur' => 'ROLE_FORMATEUR',
+            'Etudiant' => 'ROLE_ETUDIANT',
+            default => null,
+        };
+
+        return array_values(array_filter([
+            'ROLE_USER',
+            $role,
+        ]));
+    }
+
+    public function eraseCredentials(): void
+    {
+
     }
 
 }
