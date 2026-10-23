@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Creneau;
 use App\Entity\Emargement;
+use App\Entity\Promotion;
 use App\Entity\Utilisateur;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,19 +20,28 @@ class EmargementRepository extends ServiceEntityRepository
     }
 
     /**
-     * Nombre d'émargements d'un étudiant sur des créneaux terminés.
+     * Créneaux terminés signés dans une promotion, indexés par étudiant puis par créneau.
+     *
+     * @return array<int, array<int, true>>
      */
-    public function compterSurCreneauxTermines(Utilisateur $etudiant, \DateTimeImmutable $maintenant): int
+    public function findCreneauxSignesParEtudiant(Promotion $promotion, \DateTimeImmutable $maintenant): array
     {
-        return (int) $this->createQueryBuilder('e')
-            ->select('COUNT(e.id)')
+        $lignes = $this->createQueryBuilder('e')
+            ->select('IDENTITY(e.etudiant) AS etudiant', 'IDENTITY(e.creneau) AS creneau')
             ->join('e.creneau', 'c')
-            ->andWhere('e.etudiant = :etudiant')
+            ->andWhere('c.promotion = :promotion')
             ->andWhere('c.fin <= :maintenant')
-            ->setParameter('etudiant', $etudiant)
+            ->setParameter('promotion', $promotion)
             ->setParameter('maintenant', $maintenant)
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getScalarResult();
+
+        $index = [];
+        foreach ($lignes as $ligne) {
+            $index[(int) $ligne['etudiant']][(int) $ligne['creneau']] = true;
+        }
+
+        return $index;
     }
 
     /**
@@ -103,5 +113,20 @@ class EmargementRepository extends ServiceEntityRepository
         }
 
         return $parCreneau;
+    }
+
+    /**
+     * Émargements d'un étudiant, indexés par créneau.
+     *
+     * @return array<int, Emargement>
+     */
+    public function findPourEtudiantParCreneau(Utilisateur $etudiant): array
+    {
+        $index = [];
+        foreach ($this->findBy(['etudiant' => $etudiant]) as $emargement) {
+            $index[(int) $emargement->getCreneau()?->getId()] = $emargement;
+        }
+
+        return $index;
     }
 }

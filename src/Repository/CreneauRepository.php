@@ -61,18 +61,20 @@ class CreneauRepository extends ServiceEntityRepository
     }
 
     /**
-     * Nombre de créneaux d'une promotion déjà terminés.
+     * Créneaux terminés d'une promotion, du plus récent au plus ancien.
+     *
+     * @return list<Creneau>
      */
-    public function compterTerminesPourPromotion(Promotion $promotion, \DateTimeImmutable $maintenant): int
+    public function findTerminesPourPromotion(Promotion $promotion, \DateTimeImmutable $maintenant): array
     {
-        return (int) $this->createQueryBuilder('c')
-            ->select('COUNT(c.id)')
+        return $this->createQueryBuilder('c')
             ->andWhere('c.promotion = :promotion')
             ->andWhere('c.fin <= :maintenant')
             ->setParameter('promotion', $promotion)
             ->setParameter('maintenant', $maintenant)
+            ->orderBy('c.debut', 'DESC')
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getResult();
     }
 
     /**

@@ -33,4 +33,22 @@ class PromotionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /** Le formateur est référent de la promotion ou y anime au moins un créneau. */
+    public function estSuiviePar(Promotion $promotion, Utilisateur $formateur): bool
+    {
+        if ($promotion->getFormateurReferent() === $formateur) {
+            return true;
+        }
+
+        return (bool) $this->getEntityManager()->createQueryBuilder()
+            ->select('COUNT(c.id)')
+            ->from('App\Entity\Creneau', 'c')
+            ->andWhere('c.promotion = :promotion')
+            ->andWhere('c.formateur = :formateur')
+            ->setParameter('promotion', $promotion)
+            ->setParameter('formateur', $formateur)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }
