@@ -3,10 +3,8 @@
 namespace App\Service\Catalogue;
 
 use App\Entity\Formation;
-use Dompdf\Dompdf;
-use Dompdf\Options;
+use App\Service\Pdf\GenerateurPdf;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Twig\Environment;
 
 /**
  * Fournit le programme d'une formation en PDF.
@@ -17,7 +15,7 @@ use Twig\Environment;
 final class ProgrammePdf
 {
     public function __construct(
-        private readonly Environment $twig,
+        private readonly GenerateurPdf $pdf,
         #[Autowire('%kernel.project_dir%/public/documents/programmes')]
         private readonly string $dossierProgrammes,
     ) {
@@ -37,19 +35,9 @@ final class ProgrammePdf
 
     public function generer(Formation $formation): string
     {
-        $options = new Options();
-        $options->setIsRemoteEnabled(false);
-        $options->setIsPhpEnabled(false);
-        $options->setDefaultFont('Helvetica');
-
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($this->twig->render('formation/programme_pdf.html.twig', [
+        return $this->pdf->depuisGabarit('formation/programme_pdf.html.twig', [
             'formation' => $formation,
             'genere_le' => new \DateTimeImmutable(),
-        ]));
-        $dompdf->setPaper('A4');
-        $dompdf->render();
-
-        return (string) $dompdf->output();
+        ]);
     }
 }
