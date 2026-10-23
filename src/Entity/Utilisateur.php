@@ -2,41 +2,81 @@
 
 namespace App\Entity;
 
+use App\Enum\RoleUtilisateur;
+use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\Mapping as ORM;
-
-use Symfony\Component\Security\Core\User\UserInterface;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
+use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
-#[ORM\Table(name: 'Utilisateur')]
-class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
+/**
+ * Compte de l'ENT (administrateur, formateur ou étudiant).
+ *
+ * La double authentification (TOTP) est obligatoire : tant qu'elle n'est pas
+ * activée, l'utilisateur est redirigé vers la page d'enrôlement.
+ */
+#[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
+#[UniqueEntity('email', message: 'Un compte existe déjà avec cette adresse e-mail.')]
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'idUtilisateur', type: 'integer')]
+    #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'Nom', type: 'string', nullable: true)]
-    private ?string $nom;
+    #[ORM\Column(length: 100)]
+    #[Assert\NotBlank]
+    private ?string $nom = null;
 
-    #[ORM\Column(name: 'Prenom', type: 'string', nullable: true)]
-    private ?string $prenom;
+    #[ORM\Column(length: 100)]
+    #[Assert\NotBlank]
+    private ?string $prenom = null;
 
-    #[ORM\Column(name: 'Email', type: 'string', nullable: true)]
-    private ?string $email;
+    #[ORM\Column(length: 180, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    private ?string $email = null;
 
-    #[ORM\Column(name: 'Role', type: 'string', nullable: true)]
-    private ?string $role;
+    #[ORM\Column(length: 20, enumType: RoleUtilisateur::class)]
+    #[Assert\NotNull]
+    private ?RoleUtilisateur $role = null;
 
-    #[ORM\Column(name: 'PeutEtreJure', type: 'boolean', nullable: true)]
-    private ?bool $peutEtreJure;
+    #[ORM\Column(options: ['default' => false])]
+    private bool $peutEtreJure = false;
 
-    #[ORM\Column(name: 'MotDePasse', type: 'string', nullable: true)]
-    private ?string $motDePasse;
+    #[ORM\Column(length: 255)]
+    private ?string $motDePasse = null;
 
-    #[ORM\ManyToOne(targetEntity: Formation::class)]
-    #[ORM\JoinColumn(name: 'idFormation', referencedColumnName: 'idFormation', nullable: false)]
-    private Formation $formation;
+    /** Promotion suivie (étudiants uniquement). */
+    #[ORM\ManyToOne(inversedBy: 'etudiants')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Promotion $promotion = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $totpSecret = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $totpActive = false;
+
+    #[ORM\Column(options: ['default' => true])]
+    private bool $actif = true;
+
+    #[ORM\Column]
+    private \DateTimeImmutable $createdAt;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
+    public function __toString(): string
+    {
+        return $this->getNomComplet();
+    }
 
     public function getId(): ?int
     {
@@ -48,9 +88,10 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->nom;
     }
 
-    public function setNom(?string $nom): self
+    public function setNom(string $nom): static
     {
         $this->nom = $nom;
+
         return $this;
     }
 
@@ -59,10 +100,21 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->prenom;
     }
 
-    public function setPrenom(?string $prenom): self
+    public function setPrenom(string $prenom): static
     {
         $this->prenom = $prenom;
+
         return $this;
+    }
+
+    public function getNomComplet(): string
+    {
+        return trim($this->prenom.' '.$this->nom);
+    }
+
+    public function getInitiales(): string
+    {
+        return mb_strtoupper(mb_substr((string) $this->prenom, 0, 1).mb_substr((string) $this->nom, 0, 1));
     }
 
     public function getEmail(): ?string
@@ -70,60 +122,69 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(?string $email): self
+    public function setEmail(string $email): static
     {
-        $this->email = $email;
+        $this->email = mb_strtolower(trim($email));
+
         return $this;
     }
 
-    public function getRole(): ?string
+    public function getRole(): ?RoleUtilisateur
     {
         return $this->role;
     }
 
-    public function setRole(?string $role): self
+    public function setRole(RoleUtilisateur $role): static
     {
         $this->role = $role;
+
         return $this;
     }
 
-    public function getPeutEtreJure(): ?bool
+    public function isPeutEtreJure(): bool
     {
         return $this->peutEtreJure;
     }
 
-    public function setPeutEtreJure(?bool $peutEtreJure): self
+    public function setPeutEtreJure(bool $peutEtreJure): static
     {
         $this->peutEtreJure = $peutEtreJure;
+
         return $this;
     }
 
-    public function getMotDePasse(): ?string
+    public function getPromotion(): ?Promotion
     {
-        return $this->motDePasse;
+        return $this->promotion;
     }
 
-    public function setMotDePasse(?string $motDePasse): self
+    public function setPromotion(?Promotion $promotion): static
     {
-        $this->motDePasse = $motDePasse;
+        $this->promotion = $promotion;
+
         return $this;
     }
 
-    public function getFormation(): Formation
+    public function isActif(): bool
     {
-        return $this->formation;
+        return $this->actif;
     }
 
-    public function setFormation(Formation $formation): self
+    public function setActif(bool $actif): static
     {
-        $this->formation = $formation;
+        $this->actif = $actif;
+
         return $this;
     }
 
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
 
     public function getUserIdentifier(): string
     {
-        return $this->email ?? '';
+        return (string) $this->email;
     }
 
     public function getPassword(): ?string
@@ -131,7 +192,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->motDePasse;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(string $password): static
     {
         $this->motDePasse = $password;
 
@@ -140,22 +201,71 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        $role = match ($this->role) {
-            'Admin' => 'ROLE_ADMIN',
-            'Formateur' => 'ROLE_FORMATEUR',
-            'Etudiant' => 'ROLE_ETUDIANT',
-            default => null,
-        };
-
         return array_values(array_filter([
             'ROLE_USER',
-            $role,
+            $this->role?->roleSymfony(),
         ]));
     }
 
-    public function eraseCredentials(): void
+    /**
+     * Ne sérialise pas le hash complet dans la session (recommandation Symfony 7.3+).
+     */
+    public function __serialize(): array
     {
+        $donnees = (array) $this;
+        $donnees["\0".self::class."\0motDePasse"] = hash('crc32c', (string) $this->motDePasse);
+        $donnees["\0".self::class."\0totpSecret"] = null;
 
+        return $donnees;
     }
 
+    #[\Deprecated]
+    public function eraseCredentials(): void
+    {
+    }
+
+    // --- Double authentification (TOTP) ---
+
+    public function isTotpAuthenticationEnabled(): bool
+    {
+        return $this->totpActive && null !== $this->totpSecret;
+    }
+
+    public function getTotpAuthenticationUsername(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function getTotpAuthenticationConfiguration(): ?TotpConfigurationInterface
+    {
+        if (null === $this->totpSecret) {
+            return null;
+        }
+
+        return new TotpConfiguration($this->totpSecret, TotpConfiguration::ALGORITHM_SHA1, 30, 6);
+    }
+
+    public function getTotpSecret(): ?string
+    {
+        return $this->totpSecret;
+    }
+
+    public function setTotpSecret(?string $totpSecret): static
+    {
+        $this->totpSecret = $totpSecret;
+
+        return $this;
+    }
+
+    public function isTotpActive(): bool
+    {
+        return $this->totpActive;
+    }
+
+    public function setTotpActive(bool $totpActive): static
+    {
+        $this->totpActive = $totpActive;
+
+        return $this;
+    }
 }

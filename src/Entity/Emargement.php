@@ -2,49 +2,121 @@
 
 namespace App\Entity;
 
+use App\Repository\EmargementRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
-#[ORM\Table(name: 'Emargement')]
+/**
+ * Signature de présence d'un étudiant sur un créneau.
+ *
+ * Une seule signature par étudiant et par créneau (contrainte d'unicité en base).
+ * L’empreinte (HMAC-SHA256, voir EmpreinteEmargement) scelle l’étudiant, le créneau, l’horodatage et l’image de la
+ * signature : toute modification ultérieure de la ligne devient détectable.
+ */
+#[ORM\Entity(repositoryClass: EmargementRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_emargement_creneau_etudiant', columns: ['creneau_id', 'etudiant_id'])]
 class Emargement
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'idEmargement', type: 'integer')]
+    #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'DateEmargement', type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $dateEmargement;
+    #[ORM\ManyToOne(inversedBy: 'emargements')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Creneau $creneau = null;
 
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
-    #[ORM\JoinColumn(name: 'idUtilisateur', referencedColumnName: 'idUtilisateur', nullable: false)]
-    private Utilisateur $utilisateur;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Utilisateur $etudiant = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $signeLe = null;
+
+    /** Image PNG de la signature manuscrite, encodée en data URL. */
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $signature = null;
+
+    #[ORM\Column(length: 64)]
+    private ?string $empreinte = null;
+
+    #[ORM\Column(length: 45, nullable: true)]
+    private ?string $adresseIp = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getDateEmargement(): ?\DateTimeInterface
+    public function getCreneau(): ?Creneau
     {
-        return $this->dateEmargement;
+        return $this->creneau;
     }
 
-    public function setDateEmargement(?\DateTimeInterface $dateEmargement): self
+    public function setCreneau(Creneau $creneau): static
     {
-        $this->dateEmargement = $dateEmargement;
+        $this->creneau = $creneau;
+
         return $this;
     }
 
-    public function getUtilisateur(): Utilisateur
+    public function getEtudiant(): ?Utilisateur
     {
-        return $this->utilisateur;
+        return $this->etudiant;
     }
 
-    public function setUtilisateur(Utilisateur $utilisateur): self
+    public function setEtudiant(Utilisateur $etudiant): static
     {
-        $this->utilisateur = $utilisateur;
+        $this->etudiant = $etudiant;
+
         return $this;
     }
 
+    public function getSigneLe(): ?\DateTimeImmutable
+    {
+        return $this->signeLe;
+    }
+
+    public function setSigneLe(\DateTimeImmutable $signeLe): static
+    {
+        $this->signeLe = $signeLe;
+
+        return $this;
+    }
+
+    public function getSignature(): ?string
+    {
+        return $this->signature;
+    }
+
+    public function setSignature(string $signature): static
+    {
+        $this->signature = $signature;
+
+        return $this;
+    }
+
+    public function getEmpreinte(): ?string
+    {
+        return $this->empreinte;
+    }
+
+    public function setEmpreinte(string $empreinte): static
+    {
+        $this->empreinte = $empreinte;
+
+        return $this;
+    }
+
+    public function getAdresseIp(): ?string
+    {
+        return $this->adresseIp;
+    }
+
+    public function setAdresseIp(?string $adresseIp): static
+    {
+        $this->adresseIp = $adresseIp;
+
+        return $this;
+    }
 }
