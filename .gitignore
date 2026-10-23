@@ -24,3 +24,11 @@ flyway.conf
 
 # IDE
 .idea/
+
+###> expernet ###
+# Dépendances front éventuelles, rapports de tests et fichiers d'environnement locaux
+/node_modules/
+/coverage/
+/var/coverage/
+*.log
+###< expernet ###

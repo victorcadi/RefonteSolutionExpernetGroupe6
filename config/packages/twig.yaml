@@ -1,5 +1,12 @@
 twig:
     file_name_pattern: '*.twig'
+    date:
+        timezone: '%env(APP_TIMEZONE)%'
+        format: 'd/m/Y H:i'
+    number_format:
+        decimals: 0
+        decimal_point: ','
+        thousands_separator: ' '
 
 when@test:
     twig:
