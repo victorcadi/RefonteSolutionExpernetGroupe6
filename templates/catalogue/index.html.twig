@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-{% form_theme form 'bootstrap_5_layout.html.twig' %}
 
 {% set libelle_univers = univers ? (univers.value == 'continue' ? 'Formations continues' : 'Formations en alternance') : 'Catalogue des formations' %}
 {% set route_params = univers ? {univers: univers.value} : {} %}

@@ -1,5 +1,6 @@
 twig:
     file_name_pattern: '*.twig'
+    form_themes: ['form/theme_expernet.html.twig']
     date:
         timezone: '%env(APP_TIMEZONE)%'
         format: 'd/m/Y H:i'

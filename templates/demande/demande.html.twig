@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% set devis = type.value == 'devis' %}
+{% set titre = devis ? 'Demander un devis' : 'Nous contacter' %}
+
+{% block title %}{{ form.vars.submitted and not form.vars.valid ? 'Erreur – ' : '' }}{{ titre }}{% endblock %}
+{% block meta_description %}
+    {%- if devis -%}
+        Demandez un devis gratuit pour une formation Expernet en intra-entreprise, en inter-entreprise ou sur mesure, à La Réunion et à Mayotte.
+    {%- else -%}
+        Contactez Expernet, centre de formation en informatique et marketing digital à La Réunion et à Mayotte : téléphone, e-mail, adresses de nos sites.
+    {%- endif -%}
+{% endblock %}
+{% block canonical %}{{ url(devis ? 'app_devis' : 'app_contact') }}{% endblock %}
+{% block robots %}{% if formation %}<meta name="robots" content="noindex, follow">{% endif %}{% endblock %}
+
+{% block body %}
+    <header class="entete-page">
+        <div class="forme-deco forme-deco--bas-droite" aria-hidden="true"></div>
+        <div class="container-xl position-relative">
+            {{ include('partials/_fil_ariane.html.twig', {elements: [
+                {libelle: 'Accueil', url: path('app_accueil')},
+                {libelle: titre},
+            ]}) }}
+            <h1>{{ titre }}</h1>
+            <p class="texte-intro texte-lecture mb-0">
+                {% if devis %}
+                    Décrivez votre besoin : notre équipe vous propose une offre adaptée à votre entreprise, en intra, en inter-entreprise ou sur mesure.
+                {% else %}
+                    Une question sur une formation, un financement ou l’accessibilité ? Écrivez-nous ou appelez-nous.
+                {% endif %}
+            </p>
+        </div>
+    </header>
+
+    <div class="container-xl py-4 py-lg-5">
+        <div class="row g-4 g-lg-5">
+            <div class="col-lg-8">
+                {{ form_start(form, {attr: {class: 'encart', 'aria-labelledby': 'titre-formulaire'}}) }}
+                    <h2 id="titre-formulaire" class="h4">{{ devis ? 'Votre demande de devis' : 'Votre message' }}</h2>
+                    <p class="small">Les champs marqués d’un astérisque (<span aria-hidden="true">*</span>) sont obligatoires.</p>
+
+                    {{ include('demande/_erreurs.html.twig') }}
+                    {{ form_errors(form) }}
+
+                    {{ form_row(form.type) }}
+
+                    <fieldset class="mb-2">
+                        <legend class="h6 fw-bold">Vos coordonnées</legend>
+                        <div class="row g-3">
+                            <div class="col-md-6">{{ form_row(form.prenom) }}</div>
+                            <div class="col-md-6">{{ form_row(form.nom) }}</div>
+                            <div class="col-md-6">{{ form_row(form.email) }}</div>
+                            <div class="col-md-6">{{ form_row(form.telephone) }}</div>
+                            <div class="col-12">{{ form_row(form.entreprise) }}</div>
+                        </div>
+                    </fieldset>
+
+                    {{ form_row(form.formation) }}
+                    {{ form_row(form.message) }}
+                    {{ form_row(form.consentement) }}
+                    {{ form_row(form.site_web) }}
+
+                    <button type="submit" class="btn btn-expernet-primary">
+                        {{ icone('send') }} Envoyer ma demande
+                    </button>
+
+                    {{ include('demande/_mention_rgpd.html.twig', {finalite: 'répondre à votre demande et, le cas échéant, vous adresser une proposition commerciale', conservation: expernet.conservation_donnees.demandes}) }}
+                {{ form_end(form) }}
+            </div>
+
+            <aside class="col-lg-4" aria-labelledby="titre-coordonnees">
+                <div class="encart section-claire">
+                    <h2 id="titre-coordonnees" class="h5 fw-bold">Nous joindre directement</h2>
+                    <ul class="liste-sans-puce mb-0">
+                        <li class="mb-2">
+                            {{ icone('telephone-fill', 'me-1 text-primary') }}
+                            <a href="tel:{{ expernet.telephone_international }}">{{ expernet.telephone }}</a>
+                        </li>
+                        <li class="mb-3">
+                            {{ icone('envelope-fill', 'me-1 text-primary') }}
+                            <a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a>
+                        </li>
+                    </ul>
+                    {% for site in expernet_sites() %}
+                        <address class="mb-3">
+                            <strong>{{ site.nom }}</strong><br>
+                            {{ site.adresse }}<br>
+                            {{ site.codePostal }} {{ site.ville }}
+                        </address>
+                    {% endfor %}
+                    <h3 class="h6 fw-bold mt-4">Accessibilité et handicap</h3>
+                    <p class="mb-0">
+                        Notre référente handicap, {{ expernet.referente_handicap.nom }}, étudie avec vous les adaptations possibles :
+                        <a href="mailto:{{ expernet.referente_handicap.email }}">{{ expernet.referente_handicap.email }}</a>.
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </div>
+{% endblock %}

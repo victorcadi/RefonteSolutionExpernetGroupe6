@@ -1,0 +1,23 @@
+{% extends 'emails/_base.html.twig' %}
+
+{% set candidat = candidature.candidat %}
+
+{% block titre %}Nouvelle candidature{% endblock %}
+
+{% block contenu %}
+    <p>
+        <strong>{{ candidature.formation.alternance ? 'Candidature' : 'Demande d’inscription' }}</strong>
+        reçue depuis le site le {{ candidature.createdAt|date('d/m/Y à H:i') }}.
+    </p>
+    <table>
+        <tr><th scope="row">Formation</th><td>{{ candidature.formation.intitule }}</td></tr>
+        {% if candidature.session %}<tr><th scope="row">Session souhaitée</th><td>Du {{ candidature.session.dateDebut|date('d/m/Y') }} au {{ candidature.session.dateFin|date('d/m/Y') }} – {{ candidature.session.lieu }}</td></tr>{% endif %}
+        <tr><th scope="row">Nom</th><td>{{ candidat.nomComplet }}</td></tr>
+        <tr><th scope="row">E-mail</th><td><a href="mailto:{{ candidat.email }}">{{ candidat.email }}</a></td></tr>
+        <tr><th scope="row">Téléphone</th><td>{{ candidat.telephone }}</td></tr>
+        {% if candidat.ville %}<tr><th scope="row">Adresse</th><td>{{ candidat.adresse }} {{ candidat.codePostal }} {{ candidat.ville }}</td></tr>{% endif %}
+        <tr><th scope="row">Dernier diplôme</th><td>{{ candidat.diplome }}</td></tr>
+        {% if candidature.message %}<tr><th scope="row">Projet</th><td>{{ candidature.message|nl2br }}</td></tr>{% endif %}
+        <tr><th scope="row">Référente handicap</th><td>{{ candidat.souhaiteContactReferentHandicap ? 'Souhaite être contacté(e) : transmettre la demande à la référente handicap.' : 'Non demandé' }}</td></tr>
+    </table>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'emails/_base.html.twig' %}
+
+{% block titre %}{{ demande.type.libelle }}{% endblock %}
+
+{% block contenu %}
+    <p><strong>{{ demande.type.libelle }}</strong> reçue depuis le site le {{ demande.createdAt|date('d/m/Y à H:i') }}.</p>
+    <table>
+        <tr><th scope="row">Nom</th><td>{{ demande.nomComplet }}</td></tr>
+        <tr><th scope="row">E-mail</th><td><a href="mailto:{{ demande.email }}">{{ demande.email }}</a></td></tr>
+        {% if demande.telephone %}<tr><th scope="row">Téléphone</th><td>{{ demande.telephone }}</td></tr>{% endif %}
+        {% if demande.entreprise %}<tr><th scope="row">Entreprise</th><td>{{ demande.entreprise }}</td></tr>{% endif %}
+        {% if demande.formation %}<tr><th scope="row">Formation</th><td>{{ demande.formation.intitule }}</td></tr>{% endif %}
+        <tr><th scope="row">Message</th><td>{{ demande.message|nl2br }}</td></tr>
+    </table>
+    <p>Répondez directement à ce message pour écrire à la personne.</p>
+{% endblock %}

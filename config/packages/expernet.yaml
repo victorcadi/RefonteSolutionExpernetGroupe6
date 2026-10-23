@@ -4,6 +4,10 @@
 parameters:
     expernet.demo: '%env(bool:APP_DEMO)%'
 
+    # Adresses utilisées par les formulaires publics (voir .env).
+    expernet.email_equipe: '%env(EXPERNET_EMAIL_EQUIPE)%'
+    expernet.email_expediteur: '%env(EXPERNET_EMAIL_EXPEDITEUR)%'
+
     expernet.organisme:
         nom: 'Expernet'
         accroche: 'Centre de formation en Informatique & Marketing Digital à La Réunion et à Mayotte'
@@ -20,6 +24,11 @@ parameters:
             nom: 'Murielle CHAMAND'
             telephone: '02 62 21 90 45'
             email: 'm.chamand@expernet.re'
+        # Durées de conservation affichées sous les formulaires (RGPD, art. 13).
+        # Valeurs recommandées par la CNIL, à faire valider par Expernet.
+        conservation_donnees:
+            demandes: '3 ans à compter de notre dernier échange'
+            candidatures: '2 ans après notre dernier échange, sans suite de votre part'
         reseaux_sociaux:
             # URL officielles à renseigner (null = icône masquée).
             facebook: null

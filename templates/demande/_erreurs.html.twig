@@ -1,0 +1,26 @@
+{#
+    Récapitulatif des erreurs en tête de formulaire (RGAA 11.10) :
+    chaque erreur renvoie vers le champ concerné.
+#}
+{% macro champs_en_erreur(vue) %}
+    {%- for enfant in vue.children -%}
+        {%- for erreur in enfant.vars.errors -%}
+            {%- set cible = enfant.vars.expanded ?? false ? enfant.children|first.vars.id : enfant.vars.id -%}
+            <li><a href="#{{ cible }}">{{ enfant.vars.label }}</a> : {{ erreur.message }}</li>
+        {%- endfor -%}
+        {%- if enfant.vars.compound and not (enfant.vars.expanded ?? false) -%}
+            {{- _self.champs_en_erreur(enfant) -}}
+        {%- endif -%}
+    {%- endfor -%}
+{% endmacro %}
+
+{% set liste = _self.champs_en_erreur(form)|trim %}
+{% if liste is not empty %}
+    <div class="alert alert-danger" role="alert">
+        {{ icone('x-circle-fill') }}
+        <div>
+            <p class="fw-bold mb-1">Le formulaire contient des erreurs. Corrigez les champs suivants :</p>
+            <ul class="mb-0">{{ liste|raw }}</ul>
+        </div>
+    </div>
+{% endif %}

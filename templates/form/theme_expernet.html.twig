@@ -1,0 +1,31 @@
+{#
+    Thème de formulaire Expernet, basé sur Bootstrap 5.
+    - Astérisque des champs obligatoires, masqué aux lecteurs d'écran
+      (l'attribut « required » est déjà annoncé).
+    - Erreurs globales du formulaire annoncées (role="alert").
+#}
+{% use 'bootstrap_5_layout.html.twig' %}
+
+{%- block form_label_content -%}
+    {{- parent() -}}
+    {#- Pas d'astérisque sur chaque option d'un groupe de boutons radio : il figure sur la légende. -#}
+    {%- set option_de_groupe = form.parent is not null and (form.parent.vars.expanded ?? false) -%}
+    {%- if required and label is not same as(false) and not option_de_groupe -%}
+        <span class="champ-obligatoire" aria-hidden="true"> *</span>
+    {%- endif -%}
+{%- endblock form_label_content %}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 and form is rootform -%}
+        <div class="alert alert-danger" role="alert">
+            {{ icone('x-circle-fill') }}
+            <div>
+                {%- for error in errors -%}
+                    <p class="mb-0" id="{{ id ~ '_error' ~ loop.index }}">{{ error.message }}</p>
+                {%- endfor -%}
+            </div>
+        </div>
+    {%- else -%}
+        {{- parent() -}}
+    {%- endif -%}
+{%- endblock form_errors %}

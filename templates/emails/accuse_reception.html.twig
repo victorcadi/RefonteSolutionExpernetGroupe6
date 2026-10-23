@@ -1,0 +1,14 @@
+{% extends 'emails/_base.html.twig' %}
+
+{% block titre %}Votre {{ objet }} a bien été reçue{% endblock %}
+
+{% block contenu %}
+    <p>Bonjour {{ prenom }},</p>
+    <p>
+        Nous avons bien reçu votre {{ objet }}{% if formation %} concernant la formation <strong>{{ formation.intitule }}</strong>{% endif %}.
+        Un membre de l’équipe Expernet reviendra vers vous prochainement.
+    </p>
+    <p>Pour toute question, vous pouvez écrire à <a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a> ou nous appeler au {{ expernet.telephone }}.</p>
+    <p>À bientôt,<br>L’équipe Expernet</p>
+    <p><small>Ce message est envoyé automatiquement, merci de ne pas y répondre directement.</small></p>
+{% endblock %}

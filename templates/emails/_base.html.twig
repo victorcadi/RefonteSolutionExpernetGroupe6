@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titre %}Expernet{% endblock %}</title>
+    {# Les messageries n'acceptent pas les feuilles de style externes : styles internes uniquement. #}
+    <style>
+        body { margin: 0; padding: 24px 12px; background: #F7F7F7; font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.5; color: #1B1B1B; }
+        .cadre { max-width: 600px; margin: 0 auto; background: #FFFFFF; border-radius: 12px; overflow: hidden; }
+        .entete { background: #0F3A4B; color: #FFFFFF; padding: 20px 28px; font-size: 20px; font-weight: bold; }
+        .contenu { padding: 24px 28px; }
+        .pied { padding: 16px 28px; background: #ECF7FB; font-size: 13px; color: #3D4A54; }
+        a { color: #0071A3; }
+        table { border-collapse: collapse; width: 100%; }
+        th { text-align: left; padding: 6px 8px 6px 0; vertical-align: top; width: 38%; color: #0F3A4B; }
+        td { padding: 6px 0; vertical-align: top; }
+        tr + tr th, tr + tr td { border-top: 1px solid #D5DCE1; }
+    </style>
+</head>
+<body>
+    <div class="cadre">
+        <div class="entete">Expernet</div>
+        <div class="contenu">{% block contenu %}{% endblock %}</div>
+        <div class="pied">
+            Expernet – {{ expernet.accroche }}<br>
+            {{ expernet.telephone }} – <a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a>
+        </div>
+    </div>
+</body>
+</html>

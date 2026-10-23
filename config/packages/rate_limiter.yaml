@@ -1,0 +1,22 @@
+# Limite d'envoi des formulaires publics (anti-abus), par adresse IP.
+framework:
+    rate_limiter:
+        formulaire_public:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'
+
+# En test, compteurs en mémoire : remis à zéro à chaque redémarrage du noyau
+# (donc à chaque requête, sauf client sans redémarrage).
+when@test:
+    services:
+        limiteur.stockage_test:
+            class: Symfony\Component\RateLimiter\Storage\InMemoryStorage
+
+    framework:
+        rate_limiter:
+            formulaire_public:
+                policy: sliding_window
+                limit: 5
+                interval: '15 minutes'
+                storage_service: limiteur.stockage_test

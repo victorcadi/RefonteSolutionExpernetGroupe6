@@ -91,3 +91,24 @@ legend.col-form-label {
     font-size: .875rem;
     color: var(--expernet-text-muted);
 }
+
+/* Astérisque des champs obligatoires (décoratif : l'attribut required est annoncé). */
+.champ-obligatoire {
+    color: var(--expernet-danger);
+    font-weight: 700;
+}
+
+/* Champ piège anti-robots : hors écran, invisible et inaccessible. */
+.champ-piege {
+    position: absolute !important;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Récapitulatif d'erreurs : liens soulignés et lisibles. */
+.alert-danger a {
+    color: inherit;
+    font-weight: 700;
+}

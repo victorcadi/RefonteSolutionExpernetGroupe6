@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% set alternance = formation and formation.alternance %}
+{% set titre = formation ? (alternance ? 'Candidater' : 'S’inscrire') : 'Candidater ou s’inscrire' %}
+
+{% block title %}{{ form.vars.submitted and not form.vars.valid ? 'Erreur – ' : '' }}{{ titre }}{{ formation ? ' – ' ~ formation.intitule : '' }}{% endblock %}
+{% block meta_description %}Candidatez à une formation en alternance ou inscrivez-vous à une formation continue Expernet, à La Réunion et à Mayotte.{% endblock %}
+{% block canonical %}{{ url('app_candidature') }}{% endblock %}
+{% block robots %}{% if formation %}<meta name="robots" content="noindex, follow">{% endif %}{% endblock %}
+
+{% block body %}
+    <header class="entete-page">
+        <div class="forme-deco forme-deco--bas-droite" aria-hidden="true"></div>
+        <div class="container-xl position-relative">
+            {% set ariane = [{libelle: 'Accueil', url: path('app_accueil')}] %}
+            {% if formation %}
+                {% set ariane = ariane|merge([{libelle: formation.intitule, url: path('app_formation_fiche', {univers: formation.type.value, slug: formation.slug})}]) %}
+            {% endif %}
+            {{ include('partials/_fil_ariane.html.twig', {elements: ariane|merge([{libelle: titre}])}) }}
+
+            <h1>{{ titre }}{% if formation %} <span class="d-block h3 mt-2">{{ formation.intitule }}</span>{% endif %}</h1>
+            <p class="texte-intro texte-lecture mb-0">
+                {% if alternance %}
+                    Envoyez votre candidature : nous étudions votre dossier puis nous vous proposons un entretien de motivation.
+                {% else %}
+                    Complétez ce formulaire : un conseiller vous recontacte pour confirmer votre inscription et étudier votre financement.
+                {% endif %}
+            </p>
+        </div>
+    </header>
+
+    <div class="container-xl py-4 py-lg-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+                {{ form_start(form, {attr: {class: 'encart', 'aria-labelledby': 'titre-formulaire'}}) }}
+                    <h2 id="titre-formulaire" class="h4">{{ alternance ? 'Votre candidature' : 'Votre demande' }}</h2>
+                    <p class="small">Les champs marqués d’un astérisque (<span aria-hidden="true">*</span>) sont obligatoires.</p>
+
+                    {{ include('demande/_erreurs.html.twig') }}
+                    {{ form_errors(form) }}
+
+                    <fieldset class="mb-2">
+                        <legend class="h6 fw-bold">Formation</legend>
+                        {{ form_row(form.formation) }}
+                        {% if form.session is defined %}{{ form_row(form.session) }}{% endif %}
+                    </fieldset>
+
+                    {% set candidat = form.candidat %}
+                    <fieldset class="mb-2">
+                        <legend class="h6 fw-bold">Vos coordonnées</legend>
+                        <div class="row g-3">
+                            <div class="col-md-6">{{ form_row(candidat.prenom) }}</div>
+                            <div class="col-md-6">{{ form_row(candidat.nom) }}</div>
+                            <div class="col-md-6">{{ form_row(candidat.email) }}</div>
+                            <div class="col-md-6">{{ form_row(candidat.telephone) }}</div>
+                            <div class="col-12">{{ form_row(candidat.adresse) }}</div>
+                            <div class="col-md-4">{{ form_row(candidat.codePostal) }}</div>
+                            <div class="col-md-8">{{ form_row(candidat.ville) }}</div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="mb-2">
+                        <legend class="h6 fw-bold">Votre parcours</legend>
+                        {{ form_row(candidat.diplome) }}
+                        {{ form_row(form.message) }}
+                    </fieldset>
+
+                    <fieldset class="mb-3">
+                        <legend class="h6 fw-bold">Accessibilité</legend>
+                        {{ form_row(candidat.souhaiteContactReferentHandicap, {help: 'Facultatif. Votre demande est transmise uniquement à la référente handicap, ' ~ expernet.referente_handicap.nom ~ '. Aucune information sur votre santé ne vous est demandée.'}) }}
+                    </fieldset>
+
+                    {{ form_row(form.consentement) }}
+                    {{ form_row(form.site_web) }}
+
+                    <button type="submit" class="btn btn-expernet-primary">
+                        {{ icone('send') }} {{ alternance ? 'Envoyer ma candidature' : 'Envoyer ma demande' }}
+                    </button>
+
+                    {{ include('demande/_mention_rgpd.html.twig', {finalite: 'étudier votre candidature ou votre inscription et organiser votre parcours', conservation: expernet.conservation_donnees.candidatures}) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
