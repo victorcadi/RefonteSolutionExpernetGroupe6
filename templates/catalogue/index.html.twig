@@ -1,0 +1,154 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% set libelle_univers = univers ? (univers.value == 'continue' ? 'Formations continues' : 'Formations en alternance') : 'Catalogue des formations' %}
+{% set route_params = univers ? {univers: univers.value} : {} %}
+{% set terme = criteres.termeRecherche %}
+
+{% block title %}{{ terme ? 'Recherche « ' ~ terme ~ ' » – ' : '' }}{{ libelle_univers }}{{ criteres.page > 1 ? ' – page ' ~ criteres.page : '' }}{% endblock %}
+
+{% block meta_description %}
+    {%- if univers and univers.value == 'alternance' -%}
+        Formations diplômantes en alternance à La Réunion et à Mayotte : titres professionnels du Bac+2 au Bac+5 en informatique et en marketing digital avec Expernet Campus.
+    {%- elseif univers -%}
+        Formations continues en informatique, cybersécurité, bureautique et marketing digital à La Réunion et à Mayotte pour les salariés, les entreprises et les demandeurs d’emploi.
+    {%- else -%}
+        Catalogue des formations Expernet : recherchez une formation continue ou en alternance par filière, niveau de certification, éligibilité au CPF et modalité.
+    {%- endif -%}
+{% endblock %}
+
+{% block robots %}{% if not criteres.estVide or criteres.page > 1 %}<meta name="robots" content="noindex, follow">{% endif %}{% endblock %}
+{% block canonical %}{{ url('app_catalogue', route_params) }}{% endblock %}
+
+{% block body %}
+    <header class="entete-page">
+        <div class="forme-deco forme-deco--bas-droite" aria-hidden="true"></div>
+        <div class="container-xl position-relative">
+            {% set ariane = [{libelle: 'Accueil', url: path('app_accueil')}] %}
+            {% if univers %}
+                {% set ariane = ariane|merge([{libelle: 'Formations', url: path('app_catalogue')}, {libelle: libelle_univers}]) %}
+            {% else %}
+                {% set ariane = ariane|merge([{libelle: 'Formations'}]) %}
+            {% endif %}
+            {{ include('partials/_fil_ariane.html.twig', {elements: ariane}) }}
+
+            <h1>{{ libelle_univers }}</h1>
+            <p class="texte-intro texte-lecture mb-0">
+                {% if univers and univers.value == 'alternance' %}
+                    Préparez un titre professionnel reconnu par l’État tout en travaillant en entreprise : la formation est financée et vous êtes rémunéré.
+                {% elseif univers %}
+                    Montez en compétences sur des formations courtes, en intra ou en inter-entreprise, en présentiel ou à distance.
+                {% else %}
+                    Trouvez la formation qui correspond à votre projet, en formation continue ou en alternance.
+                {% endif %}
+            </p>
+        </div>
+    </header>
+
+    <div class="container-xl py-4 py-lg-5">
+        {# Choix de l'univers : onglets de navigation (liens) #}
+        <nav aria-label="Type de formation" class="mb-4">
+            <ul class="nav nav-pills gap-2">
+                {% set onglets = [
+                    {valeur: null, libelle: 'Toutes les formations', total: comptes_univers|reduce((somme, n) => somme + n, 0)},
+                    {valeur: 'continue', libelle: 'Formation continue', total: comptes_univers['continue'] ?? 0},
+                    {valeur: 'alternance', libelle: 'Alternance', total: comptes_univers['alternance'] ?? 0},
+                ] %}
+                {% for onglet in onglets %}
+                    {% set actif = (univers ? univers.value : null) == onglet.valeur %}
+                    <li class="nav-item">
+                        <a class="btn btn-expernet-filter" href="{{ path('app_catalogue', (onglet.valeur ? {univers: onglet.valeur} : {})|merge(criteres.versParametres)) }}"{% if actif %} aria-current="true"{% endif %}>
+                            {{ onglet.libelle }} <span class="visually-hidden">:</span> <span>({{ onglet.total }})</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
+
+        <div class="row g-4 g-lg-5">
+            {# Filtres #}
+            <div class="col-lg-4 col-xl-3">
+                <button class="btn btn-expernet-secondary w-100 d-lg-none mb-3" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#panneau-filtres"
+                        aria-expanded="false" aria-controls="panneau-filtres">
+                    {{ icone('funnel') }} Rechercher et filtrer
+                </button>
+
+                <div class="collapse d-lg-block" id="panneau-filtres">
+                    {{ form_start(form, {action: path('app_catalogue', route_params), attr: {class: 'encart', role: 'search', 'aria-label': 'Filtrer les formations'}}) }}
+                        <h2 class="h5 fw-bold">Affiner la recherche</h2>
+                        {{ form_row(form.q) }}
+                        {{ form_row(form.filiere) }}
+                        {% if form.niveau.vars.choices is not empty %}
+                            {{ form_row(form.niveau) }}
+                        {% else %}
+                            {% do form.niveau.setRendered %}
+                        {% endif %}
+                        <fieldset class="mb-3">
+                            <legend class="col-form-label pt-0">Financement</legend>
+                            {{ form_widget(form.cpf) }}
+                        </fieldset>
+                        {{ form_row(form.modalite) }}
+                        {{ form_widget(form.thematique) }}
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-expernet-primary">{{ icone('search') }} Appliquer les filtres</button>
+                            {% if not criteres.estVide %}
+                                <a class="btn btn-expernet-outline" href="{{ path('app_catalogue', route_params) }}">Réinitialiser les filtres</a>
+                            {% endif %}
+                        </div>
+                    {{ form_end(form, {render_rest: false}) }}
+                </div>
+            </div>
+
+            {# Résultats #}
+            <div class="col-lg-8 col-xl-9">
+                <h2 class="visually-hidden">Résultats</h2>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3" role="status">
+                    <p class="mb-0 fw-bold">
+                        {% if total == 0 %}
+                            Aucune formation ne correspond
+                        {% else %}
+                            {{ total }} formation{{ total > 1 ? 's' : '' }}
+                            {{ total > 1 ? 'correspondent' : 'correspond' }}
+                        {% endif %}
+                        {{ terme ? 'à « ' ~ terme ~ ' »' : 'à votre recherche' }}
+                    </p>
+                    {% if thematique_active %}
+                        <a class="btn btn-expernet-filter btn-sm" aria-current="true"
+                           href="{{ path('app_catalogue', route_params|merge(criteres.versParametres|filter((v, k) => k != 'thematique'))) }}">
+                            {{ thematique_active.nom }} {{ icone('x-lg') }}<span class="visually-hidden">(retirer ce filtre)</span>
+                        </a>
+                    {% endif %}
+                </div>
+
+                {% if formations is empty %}
+                    <div class="encart text-center py-5">
+                        {{ icone('search', 'display-6 text-body-secondary mb-3') }}
+                        <p class="h5">Aucun résultat</p>
+                        <p class="texte-lecture mx-auto">Essayez un autre mot-clé ou retirez un filtre. Notre équipe peut aussi construire une formation sur mesure pour vous.</p>
+                        <a class="btn btn-expernet-secondary" href="{{ path('app_catalogue', route_params) }}">Voir toutes les formations</a>
+                    </div>
+                {% else %}
+                    <ul class="row g-4 liste-sans-puce">
+                        {% for formation in formations %}
+                            <li class="col-md-6 col-xl-4">
+                                {{ include('components/_carte_formation.html.twig', {
+                                    formation: formation,
+                                    prochaine: prochaines[formation.id] ?? null,
+                                }) }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    {{ include('components/_pagination.html.twig', {
+                        route: 'app_catalogue',
+                        params: route_params|merge(criteres.versParametres),
+                        page: criteres.page,
+                        pages: pages,
+                    }) }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

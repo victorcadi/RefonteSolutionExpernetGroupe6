@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Programme – {{ formation.intitule }}</title>
+    {# Styles internes : dompdf n'accède pas aux feuilles de style du site. #}
+    <style>
+        @page { margin: 22mm 18mm; }
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #1B1B1B; line-height: 1.45; }
+        h1 { font-size: 20pt; color: #0071A3; margin: 0 0 4mm; }
+        h2 { font-size: 12.5pt; color: #0F3A4B; border-bottom: 1.5pt solid #009DDF; padding-bottom: 1mm; margin: 6mm 0 2mm; }
+        .entete { border-bottom: 3pt solid #ED8F00; padding-bottom: 3mm; margin-bottom: 5mm; }
+        .organisme { font-size: 9pt; color: #5C6670; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 1.5mm 2mm; vertical-align: top; border-bottom: .5pt solid #D5DCE1; }
+        td.libelle { width: 32%; font-weight: bold; color: #0F3A4B; }
+        ul { margin: 1mm 0; padding-left: 5mm; }
+        .chapitre { margin: 2mm 0 0; }
+        .demo { background: #FFF4D6; color: #8A5A00; padding: 2mm 3mm; margin-bottom: 4mm; font-size: 9pt; }
+        .pied { position: fixed; bottom: -12mm; left: 0; right: 0; font-size: 8pt; color: #5C6670; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="pied">Expernet – {{ expernet.telephone }} – {{ expernet.email }} – Document généré le {{ genere_le|date('d/m/Y') }}</div>
+
+    <div class="entete">
+        <div class="organisme">EXPERNET – {{ expernet.accroche }}</div>
+        <h1>{{ formation.intitule }}</h1>
+        <div>{{ formation.type.libelle }} – {{ formation.thematique.nom }}</div>
+    </div>
+
+    {% if expernet_demo %}
+        <div class="demo">Document de démonstration : le contenu, la durée et le tarif sont fictifs.</div>
+    {% endif %}
+
+    <p>{{ formation.resume }}</p>
+
+    <table>
+        <tr><td class="libelle">Public</td><td>{{ formation.public }}</td></tr>
+        <tr><td class="libelle">Durée</td><td>{{ formation.duree }}</td></tr>
+        {% if formation.rythme %}<tr><td class="libelle">Rythme</td><td>{{ formation.rythme }}</td></tr>{% endif %}
+        <tr><td class="libelle">Modalité</td><td>{{ formation.modalite.libelle }}</td></tr>
+        {% if formation.certification %}<tr><td class="libelle">Certification</td><td>{{ formation.certification }}{{ formation.codeRncp ? ' (' ~ formation.codeRncp ~ ')' : '' }}</td></tr>{% endif %}
+        <tr><td class="libelle">Tarif</td><td>
+            {% if formation.alternance %}Formation financée pour l’alternant{% elseif formation.prix %}{{ formation.prix|format_currency('EUR', {fraction_digit: 0}, locale: 'fr') }} HT par participant{% else %}Sur devis{% endif %}
+        </td></tr>
+    </table>
+
+    {% for type in enum_cases('App\\Enum\\TypeElementFiche') %}
+        {% set elements = formation.elementsParType(type) %}
+        {% if elements is not empty %}
+            <h2>{{ type.libelle }}</h2>
+            <ul>{% for element in elements %}<li>{{ element.libelle }}</li>{% endfor %}</ul>
+        {% endif %}
+    {% endfor %}
+
+    {% if formation.chapitres is not empty %}
+        <h2>Programme</h2>
+        {% for chapitre in formation.chapitres %}
+            <p class="chapitre"><strong>{{ loop.index }}. {{ chapitre.titre }}</strong></p>
+            <ul>{% for module in chapitre.modules %}<li>{{ module.libelle }}</li>{% endfor %}</ul>
+        {% endfor %}
+    {% endif %}
+
+    {% set sessions = formation.sessionsAVenir %}
+    {% if sessions is not empty %}
+        <h2>Prochaines dates</h2>
+        <ul>{% for session in sessions %}<li>Du {{ session.dateDebut|date('d/m/Y') }} au {{ session.dateFin|date('d/m/Y') }} – {{ session.lieu }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    <h2>Accessibilité</h2>
+    <p>Pour toute situation de handicap, contactez notre référente handicap : {{ expernet.referente_handicap.nom }}, {{ expernet.referente_handicap.telephone }}, {{ expernet.referente_handicap.email }}.</p>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{# Données structurées Course (publiées uniquement hors mode démonstration). #}
+<script type="application/ld+json">
+{{ {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: formation.intitule,
+    description: formation.resume,
+    url: url('app_formation_fiche', {univers: formation.type.value, slug: formation.slug}),
+    provider: {'@type': 'EducationalOrganization', name: expernet.nom, url: url('app_accueil')},
+    educationalCredentialAwarded: formation.certification,
+    hasCourseInstance: formation.sessionsAVenir|map(session => {
+        '@type': 'CourseInstance',
+        courseMode: formation.modalite.value == 'distanciel' ? 'online' : (formation.modalite.value == 'hybride' ? 'blended' : 'onsite'),
+        startDate: session.dateDebut|date('Y-m-d'),
+        endDate: session.dateFin|date('Y-m-d'),
+        location: session.site ? {'@type': 'Place', name: session.site.nom, address: session.site.adresse ~ ', ' ~ session.site.codePostal ~ ' ' ~ session.site.ville} : null,
+    }),
+}|filter(v => v is not null)|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}
+</script>

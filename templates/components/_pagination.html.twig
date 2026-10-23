@@ -1,0 +1,34 @@
+{# Pagination accessible. Paramètres : route, params, page, pages. #}
+{% if pages > 1 %}
+    <nav class="mt-5" aria-label="Pagination des résultats">
+        <ul class="pagination flex-wrap justify-content-center gap-1">
+            <li class="page-item{{ page <= 1 ? ' disabled' : '' }}">
+                {% if page > 1 %}
+                    <a class="page-link" href="{{ path(route, params|merge({page: page - 1})) }}" rel="prev">
+                        {{ icone('chevron-left') }}<span class="visually-hidden">Page précédente</span>
+                    </a>
+                {% else %}
+                    <span class="page-link">{{ icone('chevron-left') }}<span class="visually-hidden">Page précédente</span></span>
+                {% endif %}
+            </li>
+            {% for numero in 1..pages %}
+                <li class="page-item{{ numero == page ? ' active' : '' }}">
+                    {% if numero == page %}
+                        <span class="page-link" aria-current="page"><span class="visually-hidden">Page </span>{{ numero }}</span>
+                    {% else %}
+                        <a class="page-link" href="{{ path(route, params|merge({page: numero})) }}"><span class="visually-hidden">Page </span>{{ numero }}</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            <li class="page-item{{ page >= pages ? ' disabled' : '' }}">
+                {% if page < pages %}
+                    <a class="page-link" href="{{ path(route, params|merge({page: page + 1})) }}" rel="next">
+                        {{ icone('chevron-right') }}<span class="visually-hidden">Page suivante</span>
+                    </a>
+                {% else %}
+                    <span class="page-link">{{ icone('chevron-right') }}<span class="visually-hidden">Page suivante</span></span>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+{% endif %}

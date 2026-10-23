@@ -1,0 +1,182 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% endblock %}
+{% block meta_description %}Centre de formation en informatique et marketing digital à La Réunion et à Mayotte depuis {{ expernet.depuis }} : formations continues pour les salariés et les entreprises, formations diplômantes en alternance.{% endblock %}
+{% block canonical %}{{ url('app_accueil') }}{% endblock %}
+
+{% block body %}
+    {# 1. Proposition de valeur et choix de l'univers #}
+    <section class="hero theme-sombre" aria-labelledby="titre-accueil">
+        <div class="forme-deco forme-deco--haut-gauche" aria-hidden="true"></div>
+        <div class="forme-deco forme-deco--droite" aria-hidden="true"></div>
+        <div class="container-xl position-relative">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-7">
+                    <h1 id="titre-accueil">
+                        Centre de formation en <span class="mot-cle">Informatique</span> &amp; <span class="mot-cle">Marketing Digital</span> à La Réunion et à Mayotte
+                    </h1>
+                    <p class="hero-slogan">{{ expernet.slogan }}</p>
+                    <p class="texte-intro">
+                        <strong>Expernet est un organisme de formation spécialisé dans l’informatique et le marketing digital depuis {{ expernet.depuis }}.</strong>
+                        Que vous cherchiez de nouvelles compétences, une reconversion ou un premier pas dans le numérique, nous vous accompagnons dans votre projet.
+                    </p>
+                    <p>Programme adapté à votre niveau, encadrement de proximité par des formateurs professionnels : notre équipe est à votre écoute pour votre réussite.</p>
+                    <a class="btn btn-expernet-primary btn-lg mt-2" href="{{ path('app_catalogue') }}">
+                        Voir les formations {{ icone('arrow-right') }}
+                    </a>
+                </div>
+
+                <div class="col-lg-5">
+                    <h2 class="h5 fw-bold mb-3">Quel est votre projet ?</h2>
+                    <ul class="choix-univers liste-sans-puce mb-0">
+                        <li>
+                            <a href="{{ path('app_catalogue', {univers: 'continue'}) }}">
+                                {{ icone('briefcase-fill') }}
+                                <span>
+                                    <strong>Formation continue</strong>
+                                    <span>Salariés, entreprises, demandeurs d’emploi : développez vos compétences.</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ path('app_catalogue', {univers: 'alternance'}) }}">
+                                {{ icone('mortarboard-fill') }}
+                                <span>
+                                    <strong>Expernet Campus – Alternance</strong>
+                                    <span>Préparez un titre professionnel du Bac+2 au Bac+5 en entreprise.</span>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# 2. Pourquoi choisir Expernet + chiffres clés #}
+    <section class="section" aria-labelledby="titre-pourquoi">
+        <div class="forme-deco forme-deco--gauche" aria-hidden="true"></div>
+        <div class="container-xl">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <span class="surtitre">Rassurez-vous, on s’occupe de tout</span>
+                    <h2 id="titre-pourquoi" class="section-titre">
+                        <span class="mot-cle">Pourquoi choisir Expernet</span> pour votre formation ?
+                    </h2>
+                    <p class="texte-lecture">
+                        Présent sur deux départements d’Outre-mer, La Réunion et Mayotte, Expernet vous guide vers la montée en compétences.
+                        Notre équipe pédagogique, expérimentée dans chaque domaine, propose des formations adaptées aux besoins du marché
+                        et des parcours sur mesure selon votre demande.
+                    </p>
+                    <a class="btn btn-expernet-secondary mt-2" href="{{ path('app_catalogue') }}">Voir les formations</a>
+                </div>
+                <div class="col-lg-6">
+                    <dl class="row g-4 mb-0">
+                        {% for chiffre in chiffres_cles %}
+                            <div class="col-6 chiffre-cle">
+                                <div>
+                                    <dt>{{ chiffre.libelle }}</dt>
+                                    <dd>{{ chiffre.valeur }}</dd>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# 3. Parcours de formation #}
+    <section class="section pt-0" aria-labelledby="titre-parcours">
+        <div class="container-xl">
+            <h2 id="titre-parcours" class="section-titre"><span class="mot-cle">Votre parcours</span> de formation</h2>
+            <ul class="row g-4 liste-sans-puce">
+                {% for bloc in parcours %}
+                    <li class="col-md-4">
+                        <div class="bloc-parcours">
+                            <h3>{{ bloc.titre }}</h3>
+                            <p class="mb-4">{{ bloc.texte }}</p>
+                            {{ icone(bloc.icone) }}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+
+    {# 4. Offre par thématiques #}
+    <section class="section section-claire" aria-labelledby="titre-offre">
+        <div class="container-xl">
+            <span class="surtitre">Expernet, c’est…</span>
+            <h2 id="titre-offre" class="section-titre"><span class="mot-cle">une offre large</span> de formations à La Réunion et à Mayotte</h2>
+            {% for filiere in filieres %}
+                <h3 class="h5 fw-bold mt-4">{{ filiere.nom }}</h3>
+                <ul class="liste-sans-puce d-flex flex-wrap gap-2 mb-0">
+                    {% for thematique in filiere.thematiques %}
+                        <li>
+                            <a class="btn btn-expernet-primary btn-sm" href="{{ path('app_catalogue', {thematique: thematique.slug}) }}">{{ thematique.nom }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        </div>
+    </section>
+
+    {# 5. Formations diplômantes (alternance), par filière — maquette « Formations diplômantes » #}
+    {% if diplomantes is not empty %}
+        <section class="section" aria-labelledby="titre-diplomantes">
+            <div class="container-xl">
+                <span class="surtitre">Expernet Campus</span>
+                <h2 id="titre-diplomantes" class="section-titre">Formations <span class="mot-cle">diplômantes</span> en alternance</h2>
+                {% for nom_filiere, formations in diplomantes %}
+                    <h3 class="h4 mt-4 mb-3">Formations {{ nom_filiere|lower }}</h3>
+                    <ul class="row g-4 liste-sans-puce">
+                        {% for formation in formations %}
+                            <li class="col-sm-6 col-lg-4">
+                                {{ include('components/_carte_formation.html.twig', {formation: formation, niveau_titre: 4}) }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+                <a class="btn btn-expernet-secondary mt-4" href="{{ path('app_catalogue', {univers: 'alternance'}) }}">Toutes les formations en alternance</a>
+            </div>
+        </section>
+    {% endif %}
+
+    {# 6. Formations à la une (formation continue) #}
+    {% if a_la_une is not empty %}
+        <section class="section section-primaire theme-sombre" aria-labelledby="titre-une">
+            <div class="container-xl">
+                <span class="surtitre">Formations à la une</span>
+                <h2 id="titre-une" class="section-titre">Ces formations peuvent vous <span class="mot-cle">intéresser</span></h2>
+                <ul class="row g-4 liste-sans-puce text-body">
+                    {% for formation in a_la_une %}
+                        <li class="col-md-6 col-lg-4">
+                            {{ include('components/_carte_formation.html.twig', {formation: formation}) }}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <a class="btn btn-expernet-primary mt-4" href="{{ path('app_catalogue', {univers: 'continue'}) }}">Toutes nos formations continues</a>
+            </div>
+        </section>
+    {% endif %}
+
+    {# 7. Prochaines sessions #}
+    <section class="section" aria-labelledby="titre-sessions">
+        <div class="container-xl">
+            <span class="surtitre">Planifiez votre formation</span>
+            <h2 id="titre-sessions" class="section-titre">Prochaines <span class="mot-cle">sessions</span></h2>
+            {% if prochaines_sessions is empty %}
+                <p>Aucune session n’est programmée pour le moment. Contactez-nous pour organiser une session à la date qui vous convient.</p>
+            {% else %}
+                <ul class="liste-sans-puce row g-3">
+                    {% for session in prochaines_sessions %}
+                        <li class="col-md-6 col-xl-4">
+                            {{ include('components/_carte_session.html.twig', {session: session}) }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

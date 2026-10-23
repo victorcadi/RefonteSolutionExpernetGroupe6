@@ -1,0 +1,62 @@
+{#
+    Carte de formation (formation continue ou alternance).
+    Paramètres :
+      - formation      : App\Entity\Formation
+      - niveau_titre   : niveau de titre de la carte (3 par défaut)
+      - prochaine      : Session à afficher (facultatif, évite de recharger les sessions)
+    Un seul lien (le titre, étiré sur toute la carte) : pas de liens concurrents.
+#}
+{% set niveau_titre = niveau_titre ?? 3 %}
+{% set alternance = formation.alternance %}
+{% set prochaine = prochaine is defined ? prochaine : formation.prochaineSession %}
+{% set url_fiche = path('app_formation_fiche', {univers: formation.type.value, slug: formation.slug}) %}
+
+<article class="carte{{ alternance ? ' carte--alternance' : '' }}">
+    <div class="carte-visuel" aria-hidden="true">
+        {{ icone(alternance ? 'mortarboard-fill' : 'journal-text') }}
+        {% if formation.niveauLibelle %}
+            <span class="carte-badge badge-expernet badge-expernet--niveau">{{ formation.niveauLibelle }}</span>
+        {% endif %}
+    </div>
+
+    <div class="carte-corps">
+        <p class="carte-categorie mb-0">
+            {{ formation.thematique.nom }}
+            <span class="visually-hidden"> – {{ formation.type.libelle }}</span>
+        </p>
+
+        <h{{ niveau_titre }} class="carte-titre">
+            <a href="{{ url_fiche }}" class="stretched-link">{{ formation.intitule }}</a>
+        </h{{ niveau_titre }}>
+
+        <p class="mb-1">{{ formation.resume }}</p>
+
+        <ul class="carte-infos">
+            <li>{{ icone('clock') }}<span><span class="visually-hidden">Durée : </span>{{ formation.duree }}</span></li>
+            {% if formation.niveauRncp %}
+                <li>{{ icone('award-fill') }}<span>Certification de niveau {{ formation.niveauRncp }}</span></li>
+            {% endif %}
+            <li>{{ icone('geo-alt') }}<span><span class="visually-hidden">Modalité : </span>{{ formation.modalite.libelle }}</span></li>
+            <li>
+                {{ icone('calendar-event') }}
+                <span>
+                    {% if prochaine %}
+                        {{ alternance ? 'Prochaine rentrée' : 'Prochaine session' }} : {{ prochaine.dateDebut|date('d/m/Y') }}{{ prochaine.site ? ' à ' ~ prochaine.site.ville : '' }}
+                    {% else %}
+                        {{ alternance ? 'Rentrée' : 'Session' }} sur demande
+                    {% endif %}
+                </span>
+            </li>
+        </ul>
+
+        {% if formation.eligibleCpf %}
+            <p class="mb-0"><span class="badge-expernet badge-expernet--cpf">Éligible au CPF</span></p>
+        {% endif %}
+
+        <div class="carte-action" aria-hidden="true">
+            <span class="btn btn-expernet-outline btn-sm" tabindex="-1">
+                {{ alternance ? 'Admission et programme' : 'En savoir plus' }} {{ icone('arrow-right') }}
+            </span>
+        </div>
+    </div>
+</article>

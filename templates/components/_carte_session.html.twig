@@ -1,0 +1,24 @@
+{# Carte d'une session à venir. Paramètre : session (App\Entity\Session). #}
+{% set formation = session.formation %}
+<article class="carte">
+    <div class="carte-corps">
+        <p class="carte-categorie mb-0">{{ formation.type.libelle }}</p>
+        <h3 class="carte-titre h6">
+            <a class="stretched-link" href="{{ path('app_formation_fiche', {univers: formation.type.value, slug: formation.slug}) }}">{{ formation.intitule }}</a>
+        </h3>
+        <ul class="carte-infos">
+            <li>
+                {{ icone('calendar-event') }}
+                <span>
+                    {% if session.dateDebut == session.dateFin %}
+                        Le <time datetime="{{ session.dateDebut|date('Y-m-d') }}">{{ session.dateDebut|format_date('full', locale: 'fr')|capitalize }}</time>
+                    {% else %}
+                        Du <time datetime="{{ session.dateDebut|date('Y-m-d') }}">{{ session.dateDebut|date('d/m/Y') }}</time>
+                        au <time datetime="{{ session.dateFin|date('Y-m-d') }}">{{ session.dateFin|date('d/m/Y') }}</time>
+                    {% endif %}
+                </span>
+            </li>
+            <li>{{ icone('geo-alt') }}<span><span class="visually-hidden">Lieu : </span>{{ session.lieu }}</span></li>
+        </ul>
+    </div>
+</article>
