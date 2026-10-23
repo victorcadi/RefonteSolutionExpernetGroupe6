@@ -32,6 +32,15 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
         if [ "${RUN_MIGRATIONS:-1}" = '1' ] && [ -n "$(find migrations -iname '*.php' -print -quit 2>/dev/null)" ]; then
             php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing
         fi
+
+        # Développement : données de démonstration chargées une seule fois, sur une base vide
+        if [ "$APP_ENV" != 'prod' ] && [ "${CHARGER_DONNEES_DEMO:-0}" = '1' ]; then
+            comptes=$(php bin/console dbal:run-sql --force-fetch 'SELECT COUNT(*) AS nombre FROM utilisateur' | tr -d ' ' | grep -Ex '[0-9]+' || true)
+            if [ "$comptes" = '0' ]; then
+                echo 'Base vide : chargement des données de démonstration…'
+                php bin/console doctrine:fixtures:load --no-interaction
+            fi
+        fi
     fi
 
     mkdir -p var/cache var/log
