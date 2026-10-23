@@ -19,12 +19,17 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
     if grep -q '^DATABASE_URL=' .env 2>/dev/null || [ -n "${DATABASE_URL:-}" ]; then
         echo 'Attente de la base de données…'
         tentatives=60
-        until php bin/console dbal:run-sql -q 'SELECT 1' >/dev/null 2>&1; do
+        until erreur=$(COLUMNS=300 php bin/console dbal:run-sql -q 'SELECT 1' 2>&1); do
             tentatives=$((tentatives - 1))
             if [ "$tentatives" -le 0 ]; then
-                echo 'La base de données ne répond pas : abandon.' >&2
-                php bin/console dbal:run-sql 'SELECT 1'
+                echo 'La base de données ne répond pas : abandon. Dernière erreur :' >&2
+                printf '%s\n' "$erreur" >&2
                 exit 1
+            fi
+            # Toutes les 20 secondes, affiche la raison de l'attente (accès refusé, hôte introuvable…)
+            if [ $((tentatives % 10)) -eq 0 ]; then
+                echo "Base de données toujours inaccessible (encore $tentatives essais). Dernière erreur :" >&2
+                printf '%s\n' "$erreur" | grep -E 'SQLSTATE|Unable|Cannot|denied|refused|Unknown|getaddrinfo' | head -n 2 >&2 || true
             fi
             sleep 2
         done
