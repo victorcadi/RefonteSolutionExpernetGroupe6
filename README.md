@@ -1,0 +1,157 @@
+# Expernet – refonte du site
+
+Site d'Expernet, organisme de formation à La Réunion et à Mayotte : formation continue et alternance (Expernet Campus) réunies dans une seule application Symfony.
+
+- **Partie publique** : catalogue avec filtres, fiches formation, programme en PDF, formulaires de contact, de devis et de candidature, pages légales.
+- **Espace formation (ENT)** : connexion avec double authentification obligatoire, tableaux de bord étudiant, formateur et administrateur.
+
+Projet réalisé dans le cadre du titre CDA (Groupe 6). Le site tourne en **mode démonstration** : bandeau visible, pages non indexées par les moteurs de recherche, comptes et sessions fictifs.
+
+## Technologies
+
+Symfony 7.4, PHP 8.4, Doctrine ORM 3, MySQL 8.4, Twig, Bootstrap 5.3 (AssetMapper, sans Node.js), Stimulus, API Platform, FrankenPHP, Docker.
+
+## Démarrage avec Docker
+
+Prérequis : Docker avec Docker Compose. Rien d'autre n'est nécessaire, ni PHP ni Composer sur la machine. Avec l'ancienne version autonome de Compose, remplacer `docker compose` par `docker-compose` dans les commandes.
+
+```bash
+git clone <adresse-du-depot>
+cd RefonteSolutionExpernetGroupe6
+docker compose up -d
+```
+
+Le premier lancement prend une à deux minutes. L'application :
+
+1. installe les dépendances Composer et les librairies front (Bootstrap…) ;
+2. attend que MySQL soit prêt, puis applique les migrations ;
+3. charge les données de démonstration si la base est vide ;
+4. démarre le worker qui envoie les e-mails en arrière-plan.
+
+Pour suivre le démarrage : `docker compose logs -f app`.
+
+| Service | Adresse |
+|---|---|
+| Site | http://localhost:8000 |
+| E-mails envoyés par le site (Mailpit) | http://localhost:8025 |
+| MySQL (depuis la machine) | `127.0.0.1:3307` |
+
+### Ports déjà utilisés
+
+Les ports se changent par des variables d'environnement :
+
+```bash
+APP_PORT=8080 DATABASE_PORT=3308 MAILPIT_PORT=8026 MAILPIT_SMTP_PORT=1026 docker compose up -d
+```
+
+### Linux : identifiant utilisateur
+
+Le conteneur écrit dans le dossier du projet (`vendor/`, `var/`) avec l'utilisateur `1000` par défaut. Si `id -u` donne une autre valeur :
+
+```bash
+UID=$(id -u) GID=$(id -g) docker compose up -d
+```
+
+## Comptes de démonstration
+
+Mot de passe commun : `Expernet-Demo-2026`. Pour en choisir un autre, définir `FIXTURES_MOT_DE_PASSE` dans `.env.local` puis recharger les données.
+
+| Rôle | Identifiant |
+|---|---|
+| Administrateur | `admin@demo.expernet.test` |
+| Formateur | `formateur@demo.expernet.test`, `formateur2@demo.expernet.test` |
+| Jury | `jury@demo.expernet.test` |
+| Étudiant | `etudiant@demo.expernet.test` à `etudiant6@demo.expernet.test` |
+
+Connexion : http://localhost:8000/login. À la première connexion, l'espace formation demande d'activer la double authentification avec une application comme FreeOTP ou Google Authenticator.
+
+Pour réinitialiser la double authentification d'un compte (téléphone perdu) :
+
+```bash
+docker compose exec app php bin/console app:double-authentification:reinitialiser admin@demo.expernet.test
+```
+
+## Base de données
+
+| Paramètre | Valeur de développement |
+|---|---|
+| Base | `db_refonte_expernet` |
+| Utilisateur | `usr_expernet` |
+| Mot de passe | `app_dev_password` |
+| Mot de passe root | `root_dev_password` |
+
+Ces valeurs ne servent qu'en local. Elles se modifient avec les variables `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD` et `MYSQL_ROOT_PASSWORD`.
+
+```bash
+# Console MySQL
+docker compose exec database mysql -u usr_expernet -papp_dev_password db_refonte_expernet
+
+# Remettre les données de démonstration à zéro
+docker compose exec app php bin/console doctrine:fixtures:load
+```
+
+Les données sont conservées dans le volume Docker `database_data`. `docker compose down -v` les supprime.
+
+## Tests
+
+La base de test `db_refonte_expernet_test` est créée au premier lancement de MySQL. Avant la première exécution des tests, on y applique les migrations et on y charge les données :
+
+```bash
+docker compose exec app php bin/console doctrine:migrations:migrate -n --env=test
+docker compose exec app php bin/console doctrine:fixtures:load -n --env=test
+docker compose exec app php bin/phpunit
+```
+
+Chaque test est annulé à la fin (DAMA DoctrineTestBundle) : les données ne changent pas d'un test à l'autre.
+
+Vérifications du code :
+
+```bash
+docker compose exec app php bin/console lint:twig templates
+docker compose exec app php bin/console lint:yaml config
+docker compose exec app php bin/console lint:container
+```
+
+## Sans Docker
+
+Avec PHP 8.4 (extensions `intl`, `pdo_mysql`, `gd`, `zip`), Composer et la [CLI Symfony](https://symfony.com/download) :
+
+```bash
+composer install
+docker compose up -d database mailer   # ou un MySQL 8.4 local, à déclarer dans .env.local
+php bin/console doctrine:migrations:migrate -n
+php bin/console doctrine:fixtures:load -n
+symfony serve -d
+php bin/console messenger:consume async -vv   # envoi des e-mails
+```
+
+Les réglages propres à la machine (adresse de la base, `MAILER_DSN`…) vont dans un fichier `.env.local`, jamais versionné.
+
+## Production
+
+```bash
+docker build --target prod -t expernet .
+```
+
+L'image contient les dépendances et les assets compilés, mais aucun secret. Au lancement, il faut fournir par l'environnement du serveur :
+
+- `APP_SECRET` : chaîne aléatoire longue. Elle sert aussi à sceller les émargements, il ne faut donc plus la changer une fois le site en service ;
+- `DATABASE_URL` et `MAILER_DSN` ;
+- `APP_DEMO=0` quand le site présente des données réelles.
+
+## Organisation du code
+
+| Dossier | Contenu |
+|---|---|
+| `src/Controller` | Pages publiques ; `Ent/` pour l'espace formation |
+| `src/Entity`, `src/Repository` | Modèle de données (Doctrine) |
+| `src/Form` | Formulaires et filtres du catalogue |
+| `src/Security`, `src/EventSubscriber` | Connexion, double authentification, limites d'essais |
+| `src/Service` | PDF, e-mails, calcul d'assiduité |
+| `templates/` | Vues Twig |
+| `assets/styles` | Charte graphique (surcouche de Bootstrap) |
+| `config/packages/expernet.yaml` | Informations de l'organisme (coordonnées, mentions légales, durées de conservation) |
+| `docker/` | Point d'entrée du conteneur, initialisation de MySQL |
+| `tests/` | Tests unitaires et fonctionnels |
+
+Les commits suivent [Conventional Commits](https://www.conventionalcommits.org/fr/), en français.
