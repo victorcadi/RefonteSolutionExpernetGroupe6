@@ -2,8 +2,10 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Competence;
 use App\Entity\Creneau;
 use App\Entity\Emargement;
+use App\Entity\EvaluationCompetence;
 use App\Entity\Examen;
 use App\Entity\Formation;
 use App\Entity\Note;
@@ -12,6 +14,7 @@ use App\Entity\Session;
 use App\Entity\Site;
 use App\Entity\Utilisateur;
 use App\Enum\ModeSignature;
+use App\Enum\NiveauAcquisition;
 use App\Enum\RoleUtilisateur;
 use App\Enum\TypeExamen;
 use App\Service\Emargement\EmpreinteEmargement;
@@ -77,7 +80,7 @@ class EntFixtures extends Fixture implements DependentFixtureInterface
 
         $this->creerCreneauxEtEmargements($manager, $promotion, [$formateur, $formateur2], $etudiants);
         $this->creerNotes($manager, $etudiants, $formateur);
-        $this->creerExamen($manager, $promotion, [$formateur, $jureExterne]);
+        $this->creerExamens($manager, $promotion, $etudiants, $formateur, $formateur2, $jureExterne);
 
         $manager->flush();
     }
@@ -176,25 +179,92 @@ class EntFixtures extends Fixture implements DependentFixtureInterface
     }
 
     /**
-     * @param list<Utilisateur> $jury
+     * Trois examens couvrant les trois blocs du titre CDA :
+     * - bloc 2 : passé et clôturé, grilles complètes (résultats visibles des étudiants) ;
+     * - bloc 3 : passé il y a deux jours ouvrés, grilles en cours de saisie ;
+     * - bloc 1 : à venir.
+     *
+     * @param list<Utilisateur> $etudiants
      */
-    private function creerExamen(ObjectManager $manager, Promotion $promotion, array $jury): void
+    private function creerExamens(ObjectManager $manager, Promotion $promotion, array $etudiants, Utilisateur $formateur, Utilisateur $formateur2, Utilisateur $jureExterne): void
+    {
+        $formation = $this->getReference(CatalogueFixtures::FORMATION_CDA, Formation::class);
+        $blocs = [];
+        foreach ($formation->getCompetences() as $competence) {
+            $blocs[$competence->getBloc()][] = $competence;
+        }
+        [$bloc1, $bloc2, $bloc3] = array_values($blocs);
+        $site = $this->getReference(CatalogueFixtures::SITE_SAINTE_CLOTILDE, Site::class);
+        $aujourdhui = new \DateTimeImmutable('today');
+
+        $cloture = $this->examen($promotion, 'Épreuve écrite – bloc 2 : concevoir et développer une application en couches', TypeExamen::Ecrit,
+            $aujourdhui->modify('-9 weekdays')->setTime(13, 30), 180, $site, [$formateur, $formateur2], $bloc2);
+        $this->evaluer($manager, $cloture, $etudiants, \count($etudiants), [$formateur, $formateur2]);
+        $cloture->cloturer($formateur, $cloture->getDateExamen()->modify('+2 days')->setTime(17, 0));
+        $manager->persist($cloture);
+
+        $enCours = $this->examen($promotion, 'Mise en situation – bloc 3 : préparer le déploiement d’une application sécurisée', TypeExamen::MiseEnSituation,
+            $aujourdhui->modify('-2 weekdays')->setTime(13, 30), 150, $site, [$formateur2, $jureExterne], $bloc3);
+        $this->evaluer($manager, $enCours, $etudiants, 3, [$formateur2, $jureExterne]);
+        $manager->persist($enCours);
+
+        $manager->persist($this->examen($promotion, 'Mise en situation – bloc 1 : développer une application sécurisée', TypeExamen::MiseEnSituation,
+            (new \DateTimeImmutable('monday next week'))->modify('+2 weeks')->setTime(9, 0), 180, $site, [$formateur, $jureExterne], $bloc1));
+    }
+
+    /**
+     * @param list<Utilisateur> $jury
+     * @param list<Competence>  $competences
+     */
+    private function examen(Promotion $promotion, string $intitule, TypeExamen $type, \DateTimeImmutable $date, int $duree, Site $site, array $jury, array $competences): Examen
     {
         $examen = (new Examen())
-            ->setIntitule('Mise en situation – bloc 1 : développer une application sécurisée')
-            ->setType(TypeExamen::MiseEnSituation)
+            ->setIntitule($intitule)
+            ->setType($type)
             ->setPromotion($promotion)
-            ->setDateExamen((new \DateTimeImmutable('monday next week'))->modify('+2 weeks')->setTime(9, 0))
-            ->setDureeMinutes(180)
-            ->setSite($this->getReference(CatalogueFixtures::SITE_SAINTE_CLOTILDE, Site::class))
+            ->setDateExamen($date)
+            ->setDureeMinutes($duree)
+            ->setSite($site)
             ->setSalle('Salle 1');
         foreach ($jury as $membre) {
             $examen->ajouterMembreJury($membre);
         }
-        $manager->persist($examen);
+        foreach ($competences as $competence) {
+            $examen->ajouterCompetence($competence);
+        }
 
-        // La formation est chargée pour s'assurer que ses compétences existent (grille).
-        $this->getReference(CatalogueFixtures::FORMATION_CDA, Formation::class);
+        return $examen;
+    }
+
+    /**
+     * Grilles de démonstration : les $candidats premiers étudiants sont entièrement évalués.
+     *
+     * @param list<Utilisateur> $etudiants
+     * @param list<Utilisateur> $jury
+     */
+    private function evaluer(ObjectManager $manager, Examen $examen, array $etudiants, int $candidats, array $jury): void
+    {
+        foreach (\array_slice($etudiants, 0, $candidats) as $k => $etudiant) {
+            foreach ($examen->getCompetences() as $i => $competence) {
+                $niveau = match (($k * 2 + $i) % 6) {
+                    4 => NiveauAcquisition::EnCours,
+                    5 => 4 === $k ? NiveauAcquisition::NonAcquis : NiveauAcquisition::EnCours,
+                    default => NiveauAcquisition::Acquis,
+                };
+                $manager->persist((new EvaluationCompetence())
+                    ->setExamen($examen)
+                    ->setEtudiant($etudiant)
+                    ->setCompetence($competence)
+                    ->setNiveau($niveau)
+                    ->setCommentaire(match ($niveau) {
+                        NiveauAcquisition::EnCours => 'Démarche correcte, à consolider sur un cas plus complet.',
+                        NiveauAcquisition::NonAcquis => 'Notions à retravailler avec le formateur référent.',
+                        default => null,
+                    })
+                    ->setEvaluateur($jury[$i % \count($jury)])
+                    ->setSaisieLe($examen->getFin()->modify('+'.(30 + 10 * $k).' minutes')));
+            }
+        }
     }
 
     /** @var array<int, string> */
