@@ -1,0 +1,80 @@
+{% extends 'page/_page_texte.html.twig' %}
+
+{% block titre_page %}Accessibilité{% endblock %}
+{% block meta_description %}Déclaration d’accessibilité du site Expernet : état de conformité au RGAA, contenus non accessibles, contact et voies de recours.{% endblock %}
+{% block introduction %}Expernet s’engage à rendre son site accessible à toutes et à tous, conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005.{% endblock %}
+
+{% block sommaire %}
+    <li><a href="#etat">État de conformité</a></li>
+    <li><a href="#mesures">Mesures prises</a></li>
+    <li><a href="#non-accessibles">Contenus non accessibles</a></li>
+    <li><a href="#etablissement">Établissement de cette déclaration</a></li>
+    <li><a href="#contact">Retour d’information et contact</a></li>
+    <li><a href="#recours">Voies de recours</a></li>
+    <li><a href="#locaux">Accueil dans nos locaux</a></li>
+{% endblock %}
+
+{% block contenu %}
+    <p>Cette déclaration d’accessibilité s’applique au site public et à l’espace formation d’Expernet.</p>
+
+    <h2 id="etat">État de conformité</h2>
+    <p>
+        Le site d’Expernet est <strong>non conforme</strong> avec le référentiel général d’amélioration de l’accessibilité (RGAA), version 4.1.2 :
+        il n’a pas encore fait l’objet d’un audit de conformité.
+    </p>
+
+    <h2 id="mesures">Mesures prises lors de la conception</h2>
+    <p>La refonte du site a été conçue pour respecter le RGAA et les règles WCAG 2.2 de niveau AA :</p>
+    <ul>
+        <li>contrastes de couleurs vérifiés, information jamais transmise par la couleur seule ;</li>
+        <li>navigation complète au clavier, focus toujours visible et lien d’évitement vers le contenu ;</li>
+        <li>structure de titres hiérarchisée, zones de page identifiées et fil d’Ariane ;</li>
+        <li>formulaires avec étiquettes visibles, aides à la saisie, messages d’erreur reliés aux champs et récapitulatif des erreurs ;</li>
+        <li>affichage adapté aux mobiles, au zoom à 200 % et à la préférence « réduire les animations » ;</li>
+        <li>images décoratives ignorées par les lecteurs d’écran et alternatives textuelles pour les images porteuses d’information.</li>
+    </ul>
+
+    <h2 id="non-accessibles">Contenus non accessibles</h2>
+    <p>
+        Les documents PDF téléchargeables (programmes de formation, livret d’accueil, certificat Qualiopi) ne sont pas tous accessibles.
+        Le contenu des programmes est intégralement disponible sur la page de chaque formation ;
+        les autres documents peuvent vous être transmis dans un format accessible sur simple demande.
+    </p>
+
+    <h2 id="etablissement">Établissement de cette déclaration</h2>
+    <p>Cette déclaration a été établie le 23 octobre 2026.</p>
+    <dl>
+        <dt>Technologies utilisées</dt>
+        <dd>HTML5, CSS, JavaScript (Bootstrap 5).</dd>
+    </dl>
+
+    <h2 id="contact">Retour d’information et contact</h2>
+    <p>
+        Si vous n’arrivez pas à accéder à un contenu ou à un service, contactez-nous pour être orienté(e) vers une alternative accessible
+        ou obtenir le contenu sous une autre forme :
+    </p>
+    <ul>
+        <li>par e-mail : <a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a> ;</li>
+        <li>par téléphone : <a href="tel:{{ expernet.telephone_international }}">{{ expernet.telephone }}</a> ;</li>
+        <li>par le <a href="{{ path('app_contact') }}">formulaire de contact</a>.</li>
+    </ul>
+
+    <h2 id="recours">Voies de recours</h2>
+    <p>
+        Si vous nous avez signalé un défaut d’accessibilité qui vous empêche d’accéder à un contenu ou à un service
+        et que vous n’avez pas obtenu de réponse satisfaisante, vous pouvez :
+    </p>
+    <ul>
+        <li>écrire un message au <a href="https://formulaire.defenseurdesdroits.fr/" hreflang="fr">Défenseur des droits</a> ;</li>
+        <li>contacter le délégué du Défenseur des droits dans votre région ;</li>
+        <li>envoyer un courrier par la poste (gratuit, ne pas mettre de timbre) : Défenseur des droits, Libre réponse 71120, 75342 Paris CEDEX 07.</li>
+    </ul>
+
+    <h2 id="locaux">Accueil dans nos locaux</h2>
+    <p>
+        Pour l’accueil des personnes en situation de handicap en formation, notre référente handicap,
+        {{ expernet.referente_handicap.nom }}, étudie avec vous les aménagements possibles :
+        <a href="mailto:{{ expernet.referente_handicap.email }}">{{ expernet.referente_handicap.email }}</a>,
+        <a href="tel:{{ expernet.telephone_international }}">{{ expernet.referente_handicap.telephone }}</a>.
+    </p>
+{% endblock %}

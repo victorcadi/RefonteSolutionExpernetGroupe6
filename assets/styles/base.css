@@ -149,3 +149,37 @@ a {
         transition-duration: .01ms !important;
     }
 }
+
+/* Pages de texte (mentions légales, confidentialité, accessibilité…) */
+.contenu-texte {
+    max-width: 75ch;
+}
+
+.contenu-texte h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    scroll-margin-top: 1.5rem;
+}
+
+.contenu-texte > h2:first-child {
+    margin-top: 0;
+}
+
+.contenu-texte dt {
+    margin-top: .75rem;
+    color: var(--expernet-petrole);
+}
+
+.contenu-texte dd {
+    margin-bottom: 0;
+}
+
+.sommaire-page {
+    position: sticky;
+    top: 1.5rem;
+}
+
+.sommaire-page li + li {
+    margin-top: .5rem;
+}

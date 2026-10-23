@@ -1,0 +1,14 @@
+{% if demo %}
+# Site de démonstration : contenus fictifs, non indexés.
+User-agent: *
+Disallow: /
+{% else %}
+User-agent: *
+Disallow: /login
+Disallow: /logout
+Disallow: /ent/
+Disallow: /api/
+Disallow: /*?*formation=
+
+Sitemap: {{ url('app_sitemap') }}
+{% endif %}

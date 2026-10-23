@@ -1,0 +1,39 @@
+{#
+    Gabarit des pages de texte (mentions légales, confidentialité, accessibilité, plan du site).
+    Blocs : titre_page, introduction, contenu, sommaire (facultatif).
+#}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ block('titre_page') }}{% endblock %}
+
+{% block body %}
+    <header class="entete-page">
+        <div class="forme-deco forme-deco--bas-droite" aria-hidden="true"></div>
+        <div class="container-xl position-relative">
+            {{ include('partials/_fil_ariane.html.twig', {elements: [
+                {libelle: 'Accueil', url: path('app_accueil')},
+                {libelle: block('titre_page')|trim},
+            ]}) }}
+            <h1>{% block titre_page %}{% endblock %}</h1>
+            {% if block('introduction') is defined and block('introduction')|trim is not empty %}
+                <p class="texte-intro texte-lecture mb-0">{% block introduction %}{% endblock %}</p>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="container-xl py-4 py-lg-5">
+        <div class="row g-4 g-lg-5">
+            {% if block('sommaire') is defined and block('sommaire')|trim is not empty %}
+                <nav class="col-lg-3 order-lg-last" aria-labelledby="titre-sommaire">
+                    <div class="encart section-claire sommaire-page">
+                        <h2 id="titre-sommaire" class="h6 fw-bold">Sur cette page</h2>
+                        <ul class="liste-sans-puce mb-0">{% block sommaire %}{% endblock %}</ul>
+                    </div>
+                </nav>
+            {% endif %}
+            <div class="col-lg-9 contenu-texte">
+                {% block contenu %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -75,7 +75,7 @@
                         <h2 id="pied-reseaux">Réseaux sociaux</h2>
                         <ul class="pied-reseaux liste-sans-puce d-flex gap-2">
                             {% for nom, url in reseaux %}
-                                <li><a href="{{ url }}" rel="noopener">{{ icone(nom, '', 'Expernet sur ' ~ nom|capitalize) }}</a></li>
+                                <li><a href="{{ url }}" rel="noopener">{{ icone(nom, '', 'Expernet sur ' ~ ({facebook: 'Facebook', linkedin: 'LinkedIn', instagram: 'Instagram', youtube: 'YouTube'}[nom] ?? nom|capitalize)) }}</a></li>
                             {% endfor %}
                         </ul>
                     </section>
@@ -87,6 +87,14 @@
     <div class="pied-bas">
         <div class="container-xl py-3 d-flex flex-wrap justify-content-between gap-2">
             <p class="mb-0">© {{ 'now'|date('Y') }} Expernet</p>
+            <nav aria-label="Informations légales">
+                <ul class="pied-legal liste-sans-puce mb-0">
+                    <li><a href="{{ path('app_mentions_legales') }}">Mentions légales</a></li>
+                    <li><a href="{{ path('app_confidentialite') }}">Confidentialité</a></li>
+                    <li><a href="{{ path('app_accessibilite') }}">Accessibilité : non conforme</a></li>
+                    <li><a href="{{ path('app_plan_du_site') }}">Plan du site</a></li>
+                </ul>
+            </nav>
         </div>
     </div>
 </footer>

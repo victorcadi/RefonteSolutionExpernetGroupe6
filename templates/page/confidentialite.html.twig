@@ -1,0 +1,102 @@
+{% extends 'page/_page_texte.html.twig' %}
+
+{% set duree = expernet.conservation_donnees %}
+
+{% block titre_page %}Politique de confidentialité{% endblock %}
+{% block meta_description %}Comment Expernet utilise et protège les données transmises par les formulaires du site et l’espace formation, et comment exercer vos droits.{% endblock %}
+{% block introduction %}Cette page explique quelles données le site recueille, pourquoi, combien de temps elles sont conservées et comment exercer vos droits.{% endblock %}
+
+{% block sommaire %}
+    <li><a href="#responsable">Responsable du traitement</a></li>
+    <li><a href="#traitements">Données traitées</a></li>
+    <li><a href="#destinataires">Destinataires</a></li>
+    <li><a href="#cookies">Cookies</a></li>
+    <li><a href="#securite">Sécurité</a></li>
+    <li><a href="#droits">Vos droits</a></li>
+{% endblock %}
+
+{% block contenu %}
+    <h2 id="responsable">Responsable du traitement</h2>
+    <p>
+        {{ expernet.mentions_legales.raison_sociale }}, {{ expernet.mentions_legales.siege }}.
+        Pour toute question sur vos données : <a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a>.
+    </p>
+
+    <h2 id="traitements">Données traitées</h2>
+    <p>Le site ne recueille que les informations nécessaires à chaque démarche. Les champs facultatifs sont signalés comme tels.</p>
+
+    <div class="table-responsive" tabindex="0" role="region" aria-labelledby="titre-tableau-traitements">
+        <table class="table table-expernet align-top">
+            <caption id="titre-tableau-traitements">Traitements de données personnelles réalisés par le site</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Démarche</th>
+                    <th scope="col">Données</th>
+                    <th scope="col">Finalité et base légale</th>
+                    <th scope="col">Durée de conservation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Contact et demande de devis</th>
+                    <td>Nom, prénom, e-mail, téléphone et entreprise (facultatifs), formation concernée, message.</td>
+                    <td>Répondre à votre demande et établir une proposition. Base : mesures précontractuelles prises à votre demande.</td>
+                    <td>{{ duree.demandes|capitalize }}.</td>
+                </tr>
+                <tr>
+                    <th scope="row">Candidature et inscription</th>
+                    <td>Identité, coordonnées, dernier diplôme, formation et date souhaitées, message, souhait d’être contacté(e) par la référente handicap.</td>
+                    <td>Étudier votre candidature et organiser votre parcours. Base : mesures précontractuelles prises à votre demande.</td>
+                    <td>{{ duree.candidatures|capitalize }}.</td>
+                </tr>
+                <tr>
+                    <th scope="row">Espace formation</th>
+                    <td>Compte (nom, e-mail, rôle), émargements (date, heure, signature, adresse IP), notes et évaluations.</td>
+                    <td>Suivre la formation et justifier l’assiduité auprès des financeurs et des certificateurs. Base : exécution du contrat de formation et obligations légales de l’organisme.</td>
+                    <td>{{ duree.espace_formation|capitalize }}.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <p>
+        Aucune donnée de santé n’est demandée. Si vous souhaitez un aménagement, cochez simplement la case prévue :
+        la référente handicap vous contacte et vous choisissez ce que vous lui confiez.
+    </p>
+
+    <h2 id="destinataires">Destinataires</h2>
+    <p>
+        Les données sont réservées à l’équipe Expernet chargée de votre demande ou de votre formation.
+        Elles ne sont ni vendues ni cédées. Elles peuvent être transmises aux financeurs et aux certificateurs
+        de votre formation lorsque la réglementation l’exige. L’hébergeur du site, indiqué dans les
+        <a href="{{ path('app_mentions_legales') }}">mentions légales</a>, intervient comme sous-traitant.
+    </p>
+
+    <h2 id="cookies">Cookies</h2>
+    <p>
+        Le site n’utilise aucun cookie publicitaire ni outil de mesure d’audience.
+        Il dépose uniquement des cookies techniques, indispensables à son fonctionnement et exemptés de consentement :
+    </p>
+    <ul>
+        <li>un cookie de session, pour afficher la confirmation d’envoi d’un formulaire et maintenir votre connexion à l’espace formation ;</li>
+        <li>un cookie de sécurité qui protège les formulaires contre les envois frauduleux.</li>
+    </ul>
+    <p>C’est pourquoi aucun bandeau de consentement n’est affiché.</p>
+
+    <h2 id="securite">Sécurité</h2>
+    <p>
+        Les échanges avec le site sont chiffrés. L’accès à l’espace formation est protégé par un mot de passe personnel.
+        Chaque émargement est scellé pour qu’une modification ultérieure soit détectée.
+    </p>
+
+    <h2 id="droits">Vos droits</h2>
+    <p>
+        Vous pouvez accéder à vos données, les faire rectifier ou effacer, demander la limitation de leur traitement,
+        vous y opposer et demander leur portabilité. Écrivez à <a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a>
+        en précisant votre demande ; une réponse vous est apportée dans un délai d’un mois.
+    </p>
+    <p>
+        Si vous estimez que vos droits ne sont pas respectés, vous pouvez adresser une réclamation à la
+        <abbr title="Commission nationale de l’informatique et des libertés">CNIL</abbr> sur
+        <a href="https://www.cnil.fr/fr/plaintes" hreflang="fr">cnil.fr</a>.
+    </p>
+{% endblock %}

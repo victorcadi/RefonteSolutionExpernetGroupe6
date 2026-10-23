@@ -1,0 +1,85 @@
+{% extends 'page/_page_texte.html.twig' %}
+
+{% set ml = expernet.mentions_legales %}
+
+{% block titre_page %}Mentions légales{% endblock %}
+{% block meta_description %}Mentions légales du site Expernet : éditeur, numéro de déclaration d’activité, certification Qualiopi, hébergeur et propriété intellectuelle.{% endblock %}
+
+{% block sommaire %}
+    <li><a href="#editeur">Éditeur du site</a></li>
+    <li><a href="#organisme">Organisme de formation</a></li>
+    <li><a href="#hebergement">Hébergement</a></li>
+    <li><a href="#propriete">Propriété intellectuelle</a></li>
+    <li><a href="#responsabilite">Responsabilité</a></li>
+    <li><a href="#donnees">Données personnelles</a></li>
+{% endblock %}
+
+{% block contenu %}
+    {% if expernet_demo %}
+        <div class="alert alert-warning" role="note">
+            {{ icone('exclamation-triangle-fill') }}
+            <div>Ce site est une version de démonstration de la refonte : les formations, tarifs et dates qu’il présente sont fictifs. Les informations ci-dessous concernent l’organisme réel.</div>
+        </div>
+    {% endif %}
+
+    <h2 id="editeur">Éditeur du site</h2>
+    <dl>
+        <dt>Raison sociale</dt>
+        <dd>{{ ml.raison_sociale }}{{ ml.forme_juridique ? ', ' ~ ml.forme_juridique : '' }}{{ ml.capital ? ' au capital de ' ~ ml.capital : '' }}</dd>
+        <dt>Siège</dt>
+        <dd>{{ ml.siege }}</dd>
+        {% if ml.siret %}<dt>SIRET</dt><dd>{{ ml.siret }}</dd>{% endif %}
+        {% if ml.rcs %}<dt>RCS</dt><dd>{{ ml.rcs }}</dd>{% endif %}
+        {% if ml.tva_intracommunautaire %}<dt>TVA intracommunautaire</dt><dd>{{ ml.tva_intracommunautaire }}</dd>{% endif %}
+        <dt>Contact</dt>
+        <dd>
+            <a href="tel:{{ expernet.telephone_international }}">{{ expernet.telephone }}</a> –
+            <a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a>
+        </dd>
+        <dt>Responsable de la publication</dt>
+        <dd>{{ ml.responsable_publication ?? 'La direction d’Expernet' }}, joignable à l’adresse <a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a></dd>
+    </dl>
+
+    <h2 id="organisme">Organisme de formation</h2>
+    <dl>
+        <dt>Déclaration d’activité</dt>
+        <dd>Enregistrée sous le numéro {{ ml.declaration_activite }} auprès du préfet de région de La Réunion. {{ ml.declaration_activite_note }}</dd>
+        <dt>Certification qualité</dt>
+        <dd>
+            Certificat Qualiopi n° {{ ml.certificat_qualiopi.numero }} délivré par {{ ml.certificat_qualiopi.organisme }},
+            valable jusqu’au {{ ml.certificat_qualiopi.valide_jusqu_au|format_date('long', locale: 'fr') }}.
+            {{ expernet.certification_qualiopi }}
+            {% if expernet.certificat_qualiopi_pdf %}
+                <a href="{{ asset('documents/' ~ expernet.certificat_qualiopi_pdf) }}">Consulter le certificat <span class="visually-hidden">Qualiopi</span> (PDF)</a>.
+            {% endif %}
+        </dd>
+    </dl>
+
+    <h2 id="hebergement">Hébergement</h2>
+    <p>{{ ml.hebergeur.nom }}, {{ ml.hebergeur.adresse }}.</p>
+
+    <h2 id="propriete">Propriété intellectuelle</h2>
+    <p>
+        Les textes, le logo Expernet et la charte graphique du site sont la propriété d’Expernet.
+        Toute reproduction ou réutilisation, totale ou partielle, sans autorisation écrite est interdite.
+        La marque Qualiopi appartient au ministère chargé de la formation professionnelle.
+    </p>
+    <p>Le site utilise des ressources libres :</p>
+    <ul>
+        <li>la police de caractères Nunito, sous licence SIL Open Font License 1.1 ;</li>
+        <li>les icônes Bootstrap Icons et la bibliothèque Bootstrap, sous licence MIT.</li>
+    </ul>
+
+    <h2 id="responsabilite">Responsabilité</h2>
+    <p>
+        Expernet veille à l’exactitude des informations publiées mais ne peut garantir l’absence d’erreur.
+        Les programmes, tarifs et dates de session sont donnés à titre indicatif : ils sont confirmés dans la proposition ou la convention de formation.
+        Expernet n’est pas responsable du contenu des sites externes vers lesquels le site renvoie.
+    </p>
+
+    <h2 id="donnees">Données personnelles</h2>
+    <p>
+        Le traitement des informations transmises par les formulaires et l’espace formation est décrit dans la
+        <a href="{{ path('app_confidentialite') }}">politique de confidentialité</a>.
+    </p>
+{% endblock %}

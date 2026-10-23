@@ -1,0 +1,40 @@
+{% extends 'page/_page_texte.html.twig' %}
+
+{% block titre_page %}Plan du site{% endblock %}
+{% block meta_description %}Plan du site Expernet : accès direct à toutes les formations continues, aux formations en alternance et aux pages d’information.{% endblock %}
+
+{% block contenu %}
+    <h2>Accueil et démarches</h2>
+    <ul>
+        <li><a href="{{ path('app_accueil') }}">Accueil</a></li>
+        <li><a href="{{ path('app_catalogue') }}">Catalogue des formations</a></li>
+        <li><a href="{{ path('app_devis') }}">Demander un devis</a></li>
+        <li><a href="{{ path('app_candidature') }}">Candidater ou s’inscrire</a></li>
+        <li><a href="{{ path('app_contact') }}">Nous contacter</a></li>
+        <li><a href="{{ path('app_login') }}">Espace formation</a></li>
+    </ul>
+
+    {% for bloc in [
+        {titre: 'Formations continues', univers: 'continue', groupes: formations_continues},
+        {titre: 'Formations en alternance', univers: 'alternance', groupes: formations_alternance},
+    ] %}
+        <h2><a href="{{ path('app_catalogue', {univers: bloc.univers}) }}">{{ bloc.titre }}</a></h2>
+        {% for filiere, formations in bloc.groupes %}
+            <h3 class="h5 mt-3">{{ filiere }}</h3>
+            <ul>
+                {% for formation in formations %}
+                    <li><a href="{{ path('app_formation_fiche', {univers: bloc.univers, slug: formation.slug}) }}">{{ formation.intitule }}</a></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Aucune formation publiée pour le moment.</p>
+        {% endfor %}
+    {% endfor %}
+
+    <h2>Informations</h2>
+    <ul>
+        <li><a href="{{ path('app_mentions_legales') }}">Mentions légales</a></li>
+        <li><a href="{{ path('app_confidentialite') }}">Politique de confidentialité</a></li>
+        <li><a href="{{ path('app_accessibilite') }}">Accessibilité</a></li>
+    </ul>
+{% endblock %}

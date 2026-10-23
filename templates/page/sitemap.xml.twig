@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{% for page in [
+    {route: 'app_accueil'},
+    {route: 'app_catalogue'},
+    {route: 'app_catalogue', params: {univers: 'continue'}},
+    {route: 'app_catalogue', params: {univers: 'alternance'}},
+    {route: 'app_contact'},
+    {route: 'app_devis'},
+    {route: 'app_candidature'},
+    {route: 'app_plan_du_site'},
+    {route: 'app_mentions_legales'},
+    {route: 'app_confidentialite'},
+    {route: 'app_accessibilite'},
+] %}
+    <url><loc>{{ url(page.route, page.params ?? {}) }}</loc></url>
+{% endfor %}
+{% for formation in formations %}
+    <url>
+        <loc>{{ url('app_formation_fiche', {univers: formation.type.value, slug: formation.slug}) }}</loc>
+        {% if formation.updatedAt %}<lastmod>{{ formation.updatedAt|date('Y-m-d') }}</lastmod>{% endif %}
+    </url>
+{% endfor %}
+</urlset>
