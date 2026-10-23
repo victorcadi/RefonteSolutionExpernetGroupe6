@@ -66,6 +66,24 @@ Sous Windows et macOS (Docker Desktop), il n'y a rien à faire.
 - **Recommandé** : cloner le projet dans WSL 2 (par exemple `~/projets` dans Ubuntu) plutôt que sur `C:\`. Le site fonctionne dans les deux cas, mais il est nettement plus rapide depuis WSL 2, car Docker accède lentement aux fichiers du disque Windows.
 - Les fins de ligne sont imposées par `.gitattributes` : les scripts du dossier `docker/` restent au format Unix, même avec `core.autocrlf=true`.
 
+### Dépannage : l'application reste sur « Attente de la base de données »
+
+Toutes les 20 secondes, les journaux (`docker compose logs -f app`) affichent la raison de l'attente. Pour l'obtenir tout de suite :
+
+```bash
+docker compose ps                                              # la base doit être « healthy »
+docker compose exec app php bin/console dbal:run-sql "SELECT 1"
+```
+
+| Message | Cause | Solution |
+|---|---|---|
+| `Access denied for user 'usr_expernet'` | Le volume MySQL a été créé auparavant avec d'autres identifiants : MySQL ne les relit qu'à la création du volume. | Supprimer le volume, ce qui efface la base (les données de démonstration sont rechargées au lancement suivant) : `docker compose down -v`, puis `docker compose up -d` |
+| `Unknown database 'db_refonte_expernet'` | Même cause. | Même solution. |
+| `getaddrinfo` ou `Connection refused` | La base n'est pas démarrée ou a planté. | `docker compose logs database` |
+| `Unable to write in the cache directory` | Dossier `var/` créé par un autre utilisateur. | Supprimer le dossier `var/` du projet, puis `docker compose restart app` |
+
+Si un autre projet utilise déjà un conteneur MySQL sur le port 3307, démarrer avec `DATABASE_PORT=3308` (voir plus haut).
+
 ## Comptes de démonstration
 
 Mot de passe commun : `Expernet-Demo-2026`. Pour en choisir un autre, définir `FIXTURES_MOT_DE_PASSE` dans `.env.local` puis recharger les données.
