@@ -150,6 +150,8 @@
 
 /* Chiffres clés */
 .chiffre-cle {
+    display: flex;
+    flex-direction: column;
     margin: 0;
 }
 
@@ -169,11 +171,6 @@
 
 .chiffre-cle:nth-child(even) dd {
     color: var(--expernet-primary-dark);
-}
-
-.chiffre-cle > div {
-    display: flex;
-    flex-direction: column;
 }
 
 /* Encart d'information (fiches, contact) */
