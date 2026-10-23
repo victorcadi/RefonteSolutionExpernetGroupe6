@@ -38,4 +38,14 @@ final class AssiduiteTest extends TestCase
         self::assertSame(100.0, (new Assiduite(4, 5))->getTaux());
         self::assertSame(0, (new Assiduite(4, 5))->getAbsences());
     }
+
+    public function testAbsencesRepeteesMalgreUnBonTaux(): void
+    {
+        $assiduite = new Assiduite(40, 37, 3, new \DateTimeImmutable('2030-03-13 08:30'));
+
+        self::assertFalse($assiduite->estEnAlerte());
+        self::assertTrue($assiduite->aDesAbsencesRepetees());
+        self::assertTrue($assiduite->necessiteUnSuivi());
+        self::assertFalse((new Assiduite(40, 38, 2))->necessiteUnSuivi(), 'Deux absences d’affilée ne suffisent pas.');
+    }
 }
