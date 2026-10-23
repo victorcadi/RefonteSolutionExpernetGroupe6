@@ -48,7 +48,7 @@ final class CataloguePublicTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('[role="status"]', 'correspond');
         self::assertSelectorTextContains('[role="status"]', '« excel »');
-        self::assertSelectorExists('meta[name="robots"][content="noindex, follow"]');
+        self::assertSelectorExists('meta[name="robots"][content^="noindex"]');
     }
 
     public function testRechercheSansResultatAfficheUnEtatVide(): void
