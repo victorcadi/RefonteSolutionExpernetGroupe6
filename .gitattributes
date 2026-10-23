@@ -3,6 +3,12 @@
 # les conteneurs Linux (docker/*.sh) échouent et les fichiers générés changent.
 * text=auto eol=lf
 
+# Fichiers lus ou exécutés dans les conteneurs : LF obligatoire
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
 # Fichiers binaires : jamais convertis
 *.png binary
 *.jpg binary
