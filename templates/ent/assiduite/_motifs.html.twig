@@ -1,0 +1,10 @@
+{# Motifs de suivi d'un bilan d'assiduité (variable « assiduite »). #}
+{% if assiduite.estEnAlerte %}
+    <span class="badge-expernet badge-expernet--alerte">{{ icone('exclamation-triangle-fill') }} Moins de {{ constant('App\\Service\\Ent\\Assiduite::SEUIL_ALERTE')|number_format }} % de présence</span>
+{% endif %}
+{% if assiduite.aDesAbsencesRepetees %}
+    <span class="badge-expernet badge-expernet--alerte">{{ icone('exclamation-triangle-fill') }} {{ assiduite.absencesConsecutives }} derniers cours manqués</span>
+{% endif %}
+{% if not assiduite.necessiteUnSuivi %}
+    <span class="badge-expernet badge-expernet--succes">{{ icone('check-circle-fill') }} Assidu(e)</span>
+{% endif %}

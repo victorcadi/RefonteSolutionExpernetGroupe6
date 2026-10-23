@@ -67,6 +67,10 @@
                             <p class="mb-0 text-danger-emphasis fw-bold">
                                 {{ icone('exclamation-triangle-fill') }} Votre assiduité est inférieure à {{ constant('App\\Service\\Ent\\Assiduite::SEUIL_ALERTE')|number_format }} %. Contactez votre formateur référent.
                             </p>
+                        {% elseif assiduite.aDesAbsencesRepetees %}
+                            <p class="mb-0 text-danger-emphasis fw-bold">
+                                {{ icone('exclamation-triangle-fill') }} Vous avez manqué les {{ assiduite.absencesConsecutives }} derniers cours. En cas de difficulté, contactez votre formateur référent.
+                            </p>
                         {% endif %}
                     {% endif %}
                 </div>

@@ -1,0 +1,2 @@
+{%- set taux = assiduite.taux -%}
+{%- if taux is null -%}–{%- else -%}{{ taux|number_format(taux == taux|round ? 0 : 1, ',', ' ') }} %{%- endif -%}

@@ -5,6 +5,23 @@
 {% block contenu %}
     <h1>Bonjour {{ app.user.prenom }}</h1>
 
+    {% if a_suivre is not empty %}
+        <section class="alert alert-warning d-block mb-4" aria-labelledby="titre-alertes">
+            <h2 id="titre-alertes" class="h5 fw-bold">{{ icone('exclamation-triangle-fill') }} Assiduité : {{ a_suivre|length }} étudiant{{ a_suivre|length > 1 ? 's' : '' }} à suivre</h2>
+            <ul class="mb-0">
+                {% for suivi in a_suivre %}
+                    {% set assiduite = suivi.assiduite %}
+                    <li>
+                        <a href="{{ path('app_ent_assiduite_etudiant', {id: suivi.etudiant.promotion.id, etudiant: suivi.etudiant.id}) }}">{{ suivi.etudiant.nomComplet }}</a>
+                        ({{ suivi.etudiant.promotion.nom }}) :
+                        {{ include('ent/assiduite/_taux.html.twig') }} de présence
+                        {%- if assiduite.aDesAbsencesRepetees %}, {{ assiduite.absencesConsecutives }} derniers cours manqués{% endif %}.
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
     <div class="row g-4">
         <section class="col-lg-7" aria-labelledby="titre-cours">
             <div class="encart">
@@ -47,6 +64,11 @@
                                 <p class="mb-0 small">
                                     {{ promotion.etudiants|length }} étudiant{{ promotion.etudiants|length > 1 ? 's' : '' }}
                                     {% if promotion.formateurReferent == app.user %} · vous êtes référent(e){% endif %}
+                                </p>
+                                <p class="mb-0 small">
+                                    <a href="{{ path('app_ent_assiduite_promotion', {id: promotion.id}) }}">
+                                        {{ icone('people-fill') }} Assiduité<span class="visually-hidden"> de la promotion {{ promotion.nom }}</span>
+                                    </a>
                                 </p>
                             </li>
                         {% endfor %}

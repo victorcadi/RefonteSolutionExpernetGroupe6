@@ -1,0 +1,62 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% block title %}Assiduité – {{ promotion.nom }}{% endblock %}
+
+{% block contenu %}
+    <p class="small mb-2"><a href="{{ path(is_granted('ROLE_ADMIN') ? 'app_ent_admin' : 'app_ent_formateur') }}">{{ icone('arrow-left') }} Retour au tableau de bord</a></p>
+    <h1>Assiduité – {{ promotion.nom }}</h1>
+    <p class="texte-intro texte-lecture">
+        Bilan des émargements sur les cours terminés. Un étudiant est signalé sous {{ constant('App\\Service\\Ent\\Assiduite::SEUIL_ALERTE')|number_format }} % de présence
+        ou après {{ constant('App\\Service\\Ent\\Assiduite::SEUIL_ABSENCES_CONSECUTIVES') }} cours manqués d’affilée.
+    </p>
+
+    {% if a_suivre > 0 %}
+        <div class="alert alert-warning" role="status">
+            {{ icone('exclamation-triangle-fill') }}
+            <div>{{ a_suivre }} étudiant{{ a_suivre > 1 ? 's' : '' }} à suivre : prenez contact pour comprendre la situation.</div>
+        </div>
+    {% endif %}
+
+    {% if suivis is empty %}
+        <p>Aucun étudiant dans cette promotion.</p>
+    {% else %}
+        <div class="table-responsive" tabindex="0" role="region" aria-labelledby="legende-assiduite">
+            <table class="table table-striped table-expernet align-middle">
+                <caption id="legende-assiduite">Assiduité des étudiants, les étudiants à suivre en premier</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Étudiant</th>
+                        <th scope="col">Présence</th>
+                        <th scope="col">Cours émargés</th>
+                        <th scope="col">Dernière absence</th>
+                        <th scope="col">Suivi</th>
+                        <th scope="col">Historique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for suivi in suivis %}
+                        {% set assiduite = suivi.assiduite %}
+                        <tr>
+                            <th scope="row" class="fw-normal">{{ suivi.etudiant.nom|upper }} {{ suivi.etudiant.prenom }}</th>
+                            <td>{{ include('ent/assiduite/_taux.html.twig') }}</td>
+                            <td>{{ assiduite.presences }} / {{ assiduite.creneauxTermines }}</td>
+                            <td>
+                                {% if assiduite.derniereAbsence %}
+                                    <time datetime="{{ assiduite.derniereAbsence|date('c') }}">{{ assiduite.derniereAbsence|format_datetime('medium', 'short', locale: 'fr') }}</time>
+                                {% else %}
+                                    –
+                                {% endif %}
+                            </td>
+                            <td><div class="d-flex flex-wrap gap-1">{{ include('ent/assiduite/_motifs.html.twig') }}</div></td>
+                            <td>
+                                <a href="{{ path('app_ent_assiduite_etudiant', {id: promotion.id, etudiant: suivi.etudiant.id}) }}">
+                                    Détail<span class="visually-hidden"> des présences de {{ suivi.etudiant.nomComplet }}</span>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}

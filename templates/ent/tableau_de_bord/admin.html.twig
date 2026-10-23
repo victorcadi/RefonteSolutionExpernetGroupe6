@@ -12,6 +12,7 @@
                 {libelle: 'Étudiants actifs', valeur: comptes['Etudiant'] ?? 0},
                 {libelle: 'Formateurs actifs', valeur: comptes['Formateur'] ?? 0},
                 {libelle: 'Promotions', valeur: nombre_promotions},
+                {libelle: 'Étudiants à suivre (assiduité)', valeur: nombre_a_suivre},
                 {libelle: 'Demandes à traiter', valeur: nombre_demandes},
                 {libelle: 'Candidatures à traiter', valeur: nombre_candidatures},
             ] %}
@@ -24,6 +25,31 @@
     </section>
 
     <div class="row g-4">
+        <section class="col-12" aria-labelledby="titre-promotions">
+            <div class="encart">
+                <h2 id="titre-promotions" class="h4">Assiduité des promotions</h2>
+                {% if suivi_promotions is empty %}
+                    <p class="mb-0">Aucune promotion.</p>
+                {% else %}
+                    <ul class="liste-sans-puce liste-creneaux mb-0">
+                        {% for ligne in suivi_promotions %}
+                            <li class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                <span>
+                                    <span class="fw-bold">{{ ligne.promotion.nom }}</span>
+                                    {% if ligne.a_suivre > 0 %}
+                                        <span class="badge-expernet badge-expernet--alerte ms-1">{{ ligne.a_suivre }} étudiant{{ ligne.a_suivre > 1 ? 's' : '' }} à suivre</span>
+                                    {% endif %}
+                                </span>
+                                <a href="{{ path('app_ent_assiduite_promotion', {id: ligne.promotion.id}) }}">
+                                    {{ icone('people-fill') }} Assiduité<span class="visually-hidden"> de la promotion {{ ligne.promotion.nom }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </section>
+
         <section class="col-lg-6" aria-labelledby="titre-demandes">
             <div class="encart">
                 <h2 id="titre-demandes" class="h4">Dernières demandes reçues</h2>

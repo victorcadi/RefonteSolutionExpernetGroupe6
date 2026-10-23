@@ -15,6 +15,7 @@ use App\Repository\NoteRepository;
 use App\Repository\PromotionRepository;
 use App\Repository\UtilisateurRepository;
 use App\Service\Ent\CalculAssiduite;
+use Psr\Clock\ClockInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -27,6 +28,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/ent')]
 final class TableauDeBordController extends AbstractController
 {
+    public function __construct(
+        private readonly ClockInterface $horloge,
+    ) {
+    }
+
     /**
      * Point d'entrée de l'ENT : renvoie vers le tableau de bord du rôle.
      */
@@ -50,7 +56,7 @@ final class TableauDeBordController extends AbstractController
         ExamenRepository $examens,
         CalculAssiduite $assiduite,
     ): Response {
-        $maintenant = new \DateTimeImmutable();
+        $maintenant = \DateTimeImmutable::createFromInterface($this->horloge->now());
         $promotion = $etudiant->getPromotion();
         $finDeJournee = $maintenant->setTime(23, 59, 59);
 
@@ -76,12 +82,15 @@ final class TableauDeBordController extends AbstractController
         CreneauRepository $creneaux,
         PromotionRepository $promotions,
         ExamenRepository $examens,
+        CalculAssiduite $assiduite,
     ): Response {
-        $maintenant = new \DateTimeImmutable();
+        $maintenant = \DateTimeImmutable::createFromInterface($this->horloge->now());
+        $suivies = $promotions->findSuiviesPar($formateur);
 
         return $this->render('ent/tableau_de_bord/formateur.html.twig', [
             'creneaux' => $creneaux->findAVenirPourFormateur($formateur, $maintenant),
-            'promotions' => $promotions->findSuiviesPar($formateur),
+            'promotions' => $suivies,
+            'a_suivre' => $assiduite->aSuivre($suivies, $maintenant),
             'jurys' => $examens->findAVenirPourMembreDuJury($formateur, $maintenant),
             'maintenant' => $maintenant,
         ]);
@@ -94,10 +103,22 @@ final class TableauDeBordController extends AbstractController
         PromotionRepository $promotions,
         DemandeContactRepository $demandes,
         CandidatureRepository $candidatures,
+        CalculAssiduite $assiduite,
     ): Response {
+        $maintenant = \DateTimeImmutable::createFromInterface($this->horloge->now());
+        $suiviPromotions = [];
+        $aSuivre = 0;
+        foreach ($promotions->findBy([], ['nom' => 'ASC']) as $promotion) {
+            $nombre = \count($assiduite->aSuivre([$promotion], $maintenant));
+            $aSuivre += $nombre;
+            $suiviPromotions[] = ['promotion' => $promotion, 'a_suivre' => $nombre];
+        }
+
         return $this->render('ent/tableau_de_bord/admin.html.twig', [
             'comptes' => $utilisateurs->compterActifsParRole(),
-            'nombre_promotions' => $promotions->count([]),
+            'nombre_promotions' => \count($suiviPromotions),
+            'suivi_promotions' => $suiviPromotions,
+            'nombre_a_suivre' => $aSuivre,
             'demandes' => $demandes->findNouvelles(),
             'nombre_demandes' => $demandes->compterNouvelles(),
             'candidatures' => $candidatures->findNouvelles(),
