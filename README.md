@@ -44,6 +44,12 @@ Les ports se changent par des variables d'environnement :
 APP_PORT=8080 DATABASE_PORT=3308 MAILPIT_PORT=8026 MAILPIT_SMTP_PORT=1026 docker compose up -d
 ```
 
+Sous Windows (PowerShell) :
+
+```powershell
+$env:APP_PORT=8080; $env:DATABASE_PORT=3308; docker compose up -d
+```
+
 ### Linux : identifiant utilisateur
 
 Le conteneur écrit dans le dossier du projet (`vendor/`, `var/`) avec l'utilisateur `1000` par défaut. Si `id -u` donne une autre valeur :
@@ -51,6 +57,14 @@ Le conteneur écrit dans le dossier du projet (`vendor/`, `var/`) avec l'utilisa
 ```bash
 UID=$(id -u) GID=$(id -g) docker compose up -d
 ```
+
+Sous Windows et macOS (Docker Desktop), il n'y a rien à faire.
+
+### Windows
+
+- Installer [Docker Desktop](https://www.docker.com/products/docker-desktop/) avec le moteur WSL 2.
+- **Recommandé** : cloner le projet dans WSL 2 (par exemple `~/projets` dans Ubuntu) plutôt que sur `C:\`. Le site fonctionne dans les deux cas, mais il est nettement plus rapide depuis WSL 2, car Docker accède lentement aux fichiers du disque Windows.
+- Les fins de ligne sont imposées par `.gitattributes` : les scripts du dossier `docker/` restent au format Unix, même avec `core.autocrlf=true`.
 
 ## Comptes de démonstration
 
@@ -114,7 +128,7 @@ docker compose exec app php bin/console lint:container
 
 ## Sans Docker
 
-Avec PHP 8.4 (extensions `intl`, `pdo_mysql`, `gd`, `zip`), Composer et la [CLI Symfony](https://symfony.com/download) :
+Avec PHP 8.4 ou 8.5 (extensions `intl`, `pdo_mysql`, `gd`, `zip`, `mbstring`), Composer et la [CLI Symfony](https://symfony.com/download). Sous Windows, ces extensions sont fournies avec PHP mais doivent être activées dans `php.ini` (lignes `extension=…`).
 
 ```bash
 composer install
