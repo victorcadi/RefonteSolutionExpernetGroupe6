@@ -52,11 +52,15 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
     # Caddy écoute en HTTP sur le port 80 (le HTTPS est assuré par le proxy en production)
     SERVER_NAME=:80
 
+# Script de démarrage : nettoyé pour fonctionner même depuis un checkout Windows
+# (BOM UTF-8 retiré, fins de ligne CRLF converties, droit d'exécution forcé).
 COPY --link docker/entrypoint.sh /usr/local/bin/docker-entrypoint
-RUN chmod +x /usr/local/bin/docker-entrypoint
+RUN sed -i '1s/^\xEF\xBB\xBF//' /usr/local/bin/docker-entrypoint \
+    && sed -i 's/\r$//' /usr/local/bin/docker-entrypoint \
+    && chmod 755 /usr/local/bin/docker-entrypoint
 
 EXPOSE 80
-ENTRYPOINT ["docker-entrypoint"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
 
 HEALTHCHECK --interval=10s --timeout=3s --retries=5 --start-period=30s \

@@ -11,15 +11,15 @@ if [ "${1#-}" != "$1" ]; then
 fi
 
 if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
-    if [ "$APP_ENV" != 'prod' ] && [ ! -f vendor/autoload_runtime.php ]; then
+    if [ "${APP_ENV:-dev}" != 'prod' ] && [ ! -f vendor/autoload_runtime.php ]; then
         echo 'Installation des dépendances Composer…'
         composer install --prefer-dist --no-progress --no-interaction
     fi
 
-    if grep -q '^DATABASE_URL=' .env 2>/dev/null || [ -n "$DATABASE_URL" ]; then
+    if grep -q '^DATABASE_URL=' .env 2>/dev/null || [ -n "${DATABASE_URL:-}" ]; then
         echo 'Attente de la base de données…'
         tentatives=60
-        until php bin/console dbal:run-sql -q 'SELECT 1' > /dev/null 2>&1; do
+        until php bin/console dbal:run-sql -q 'SELECT 1' >/dev/null 2>&1; do
             tentatives=$((tentatives - 1))
             if [ "$tentatives" -le 0 ]; then
                 echo 'La base de données ne répond pas : abandon.' >&2
@@ -34,7 +34,7 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
         fi
 
         # Développement : données de démonstration chargées une seule fois, sur une base vide
-        if [ "$APP_ENV" != 'prod' ] && [ "${CHARGER_DONNEES_DEMO:-0}" = '1' ]; then
+        if [ "${APP_ENV:-dev}" != 'prod' ] && [ "${CHARGER_DONNEES_DEMO:-0}" = '1' ]; then
             comptes=$(php bin/console dbal:run-sql --force-fetch 'SELECT COUNT(*) AS nombre FROM utilisateur' | tr -d ' ' | grep -Ex '[0-9]+' || true)
             if [ "$comptes" = '0' ]; then
                 echo 'Base vide : chargement des données de démonstration…'
