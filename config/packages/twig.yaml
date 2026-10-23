@@ -7,6 +7,9 @@ twig:
         decimals: 0
         decimal_point: ','
         thousands_separator: ' '
+    globals:
+        expernet: '%expernet.organisme%'
+        expernet_demo: '%expernet.demo%'
 
 when@test:
     twig:

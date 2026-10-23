@@ -1,0 +1,38 @@
+# Contenus institutionnels d'Expernet, centralisés ici plutôt qu'en dur dans les templates.
+# Sources : site expernet.re (pied de page et page d'accueil, relevés en octobre 2026).
+# Une valeur à null masque l'élément correspondant sur le site.
+parameters:
+    expernet.demo: '%env(bool:APP_DEMO)%'
+
+    expernet.organisme:
+        nom: 'Expernet'
+        accroche: 'Centre de formation en Informatique & Marketing Digital à La Réunion et à Mayotte'
+        slogan: 'Inspirez le Digital de demain !'
+        depuis: 2002
+        telephone: '02 62 21 90 45'
+        telephone_international: '+262262219045'
+        email: 'formation@expernet.re'
+        certification_qualiopi: 'La certification qualité a été délivrée au titre de la catégorie d’actions suivantes : actions de formation, actions de formation par apprentissage.'
+        # Documents officiels : déposer le PDF dans public/documents/ puis renseigner son nom.
+        certificat_qualiopi_pdf: null
+        livret_accueil_pdf: null
+        referente_handicap:
+            nom: 'Murielle CHAMAND'
+            telephone: '02 62 21 90 45'
+            email: 'm.chamand@expernet.re'
+        reseaux_sociaux:
+            # URL officielles à renseigner (null = icône masquée).
+            facebook: null
+            linkedin: null
+
+    # Chiffres clés affichés sur la page d'accueil (expernet.re).
+    expernet.chiffres_cles:
+        - { valeur: '3 350', libelle: 'personnes formées en 2024 et 2025' }
+        - { valeur: '1 502', libelle: 'sessions de formation en 2024 et 2025' }
+        - { valeur: '86 %', libelle: 'de taux de satisfaction' }
+        - { valeur: '876', libelle: 'clients nous font confiance' }
+
+    expernet.parcours:
+        - { titre: 'Intra-entreprise', texte: 'La formation intra-entreprise est destinée à un groupe spécifique de participants au sein de la même entreprise.', icone: 'people-fill' }
+        - { titre: 'Inter-entreprise', texte: 'La formation inter-entreprise s’adresse à un public varié issu de différentes entreprises.', icone: 'building' }
+        - { titre: 'Sur-mesure', texte: 'La formation sur mesure se veut intensive et ciblée sur une courte période.', icone: 'clipboard-check' }
