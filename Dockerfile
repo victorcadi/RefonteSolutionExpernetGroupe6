@@ -64,7 +64,7 @@ ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
 
 HEALTHCHECK --interval=10s --timeout=3s --retries=5 --start-period=30s \
-    CMD curl -fsS http://127.0.0.1:2019/metrics > /dev/null || exit 1
+    CMD curl -fsS http://127.0.0.1:2019/config/ > /dev/null || exit 1
 
 # ---------------------------------------------------------------------------
 # Développement : le code est monté depuis la machine hôte
@@ -80,6 +80,8 @@ ENV SERVER_NAME=:8080 \
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini" \
     && echo 'opcache.validate_timestamps = 1' > "$PHP_INI_DIR/conf.d/20-dev.ini" \
+    && mkdir -p /app/vendor \
+    && chmod 1777 /app/vendor \
     && mkdir -p /data/caddy /config/caddy \
     && chmod -R a+rwX /data /config
 

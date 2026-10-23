@@ -1,0 +1,30 @@
+# Configuration autonome de production. Définir les variables requises
+# dans l'environnement du déploiement ou dans un fichier .env non versionné.
+services:
+  app:
+    ports:
+      - "${APP_PORT:-8000}:80"
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 0
+      APP_DEMO: ${APP_DEMO:-0}
+      APP_SECRET: ${APP_SECRET:?Définir APP_SECRET}
+      DATABASE_URL: ${DATABASE_URL:?Définir DATABASE_URL}
+      MAILER_DSN: ${MAILER_DSN:-null://null}
+      DEFAULT_URI: ${DEFAULT_URI:-http://localhost:8000}
+
+  worker:
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 0
+      APP_SECRET: ${APP_SECRET:?Définir APP_SECRET}
+      DATABASE_URL: ${DATABASE_URL:?Définir DATABASE_URL}
+      MAILER_DSN: ${MAILER_DSN:-null://null}
+      RUN_MIGRATIONS: 0
+
+  database:
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?Définir MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER:?Définir MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Définir MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Définir MYSQL_ROOT_PASSWORD}

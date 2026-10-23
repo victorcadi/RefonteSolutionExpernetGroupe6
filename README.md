@@ -50,15 +50,18 @@ Sous Windows (PowerShell) :
 $env:APP_PORT=8080; $env:DATABASE_PORT=3308; docker compose up -d
 ```
 
-### Linux : identifiant utilisateur
+### Fedora et Linux avec SELinux
 
-Le conteneur écrit dans le dossier du projet (`vendor/`, `var/`) avec l'utilisateur `1000` par défaut. Si `id -u` donne une autre valeur :
+La configuration commune ne fixe pas d'UID/GID et fonctionne aussi avec Docker Desktop sous Windows et macOS. Sur Fedora, ajoutez le fichier dédié pour adapter l'utilisateur du conteneur et son étiquetage SELinux :
 
 ```bash
-UID=$(id -u) GID=$(id -g) docker compose up -d
+HOST_UID="$(id -u)" HOST_GID="$(id -g)" \
+docker compose -f compose.yaml -f compose.override.yaml -f compose.fedora.yaml up -d
 ```
 
-Sous Windows et macOS (Docker Desktop), il n'y a rien à faire.
+Sous Windows et macOS, utilisez simplement `docker compose up -d`.
+
+Les dépendances Composer de développement sont conservées dans le volume Docker `vendor_data`, partagé par `app` et `worker`, et non dans le dossier `vendor/` de l'hôte.
 
 ### Windows
 
@@ -161,15 +164,20 @@ Les réglages propres à la machine (adresse de la base, `MAILER_DSN`…) vont d
 
 ## Production
 
+Un fichier Compose dédié publie le site sur le port 8000 (modifiable avec `APP_PORT`) et exige des secrets fournis par l'environnement de déploiement. Définissez au minimum `APP_SECRET`, `DATABASE_URL`, `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD` et `MYSQL_ROOT_PASSWORD`, puis lancez :
+
 ```bash
-docker build --target prod -t expernet .
+docker compose -f compose.yaml -f compose.prod.yaml up -d --build
 ```
 
-L'image contient les dépendances et les assets compilés, mais aucun secret. Au lancement, il faut fournir par l'environnement du serveur :
+Le site sera disponible sur `http://localhost:8000`. Encodez les caractères spéciaux des identifiants dans `DATABASE_URL` selon le format d'URL Doctrine. Le fichier `.env` fourni contient des valeurs de développement ; ne les réutilisez pas en production.
+
+L'image contient les dépendances et les assets compilés, mais aucun secret. `compose.prod.yaml` exige les paramètres suivants :
 
 - `APP_SECRET` : chaîne aléatoire longue. Elle sert aussi à sceller les émargements, il ne faut donc plus la changer une fois le site en service ;
-- `DATABASE_URL` et `MAILER_DSN` ;
-- `APP_DEMO=0` quand le site présente des données réelles.
+- `DATABASE_URL` et les variables `MYSQL_*` correspondant à la base du service ;
+- `MAILER_DSN` si l'envoi d'e-mails est configuré (`null://null` par défaut) ;
+- `APP_DEMO=0` quand le site présente des données réelles (valeur par défaut en production).
 
 ## Organisation du code
 

@@ -1,0 +1,16 @@
+# Options de développement pour Fedora/Linux avec SELinux.
+# À combiner avec compose.yaml et compose.override.yaml.
+services:
+  app:
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    security_opt:
+      - label=disable
+
+  worker:
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    security_opt:
+      - label=disable
+
+  database:
+    security_opt:
+      - label=disable

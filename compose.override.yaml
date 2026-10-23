@@ -5,12 +5,9 @@ services:
   app:
     build:
       target: dev
-    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./:/app
-    # SELinux (Fedora…) : autorise l'écriture dans le code monté sans réétiqueter les fichiers
-    security_opt:
-      - label=disable
+      - vendor_data:/app/vendor
     ports:
       - "${APP_PORT:-8000}:8080"
     # Le premier lancement installe les dépendances Composer : délai de démarrage plus long
@@ -28,12 +25,9 @@ services:
   worker:
     build:
       target: dev
-    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./:/app
-    # SELinux (Fedora…) : autorise l'écriture dans le code monté sans réétiqueter les fichiers
-    security_opt:
-      - label=disable
+      - vendor_data:/app/vendor
     environment:
       APP_ENV: dev
       # Mailpit du projet ; MAILER_DSN_DEV permet d'en viser un autre (ex. smtp://host.docker.internal:1025)
@@ -52,8 +46,6 @@ services:
     # Crée la base des tests automatiques au premier lancement
     volumes:
       - ./docker/mysql:/docker-entrypoint-initdb.d:ro
-    security_opt:
-      - label=disable
 ###< doctrine/doctrine-bundle ###
 
 ###> symfony/mailer ###
@@ -66,3 +58,6 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 ###< symfony/mailer ###
+
+volumes:
+  vendor_data:
