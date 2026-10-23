@@ -1,0 +1,19 @@
+# Fichiers exclus du contexte de construction de l'image
+**/*.log
+.git/
+.idea/
+.editorconfig
+.phpunit.cache/
+.env.local
+.env.local.php
+.env.*.local
+compose*.yaml
+composer.phar
+coverage/
+docs/
+node_modules/
+public/assets/
+public/bundles/
+assets/vendor/
+var/
+vendor/

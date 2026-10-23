@@ -1,5 +1,40 @@
-# Ports exposés sur la machine de développement.
+# Développement : code monté, utilisateur de la machine hôte, ports exposés.
+# Application : http://localhost:8000 – e-mails : http://localhost:8025
 services:
+  app:
+    build:
+      target: dev
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - ./:/app
+    # SELinux (Fedora…) : autorise l'écriture dans le code monté sans réétiqueter les fichiers
+    security_opt:
+      - label=disable
+    ports:
+      - "8000:8080"
+    environment:
+      APP_ENV: dev
+      # Mailpit du projet ; MAILER_DSN_DEV permet d'en viser un autre (ex. smtp://host.docker.internal:1025)
+      MAILER_DSN: ${MAILER_DSN_DEV:-smtp://mailer:1025}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  worker:
+    build:
+      target: dev
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - ./:/app
+    # SELinux (Fedora…) : autorise l'écriture dans le code monté sans réétiqueter les fichiers
+    security_opt:
+      - label=disable
+    environment:
+      APP_ENV: dev
+      # Mailpit du projet ; MAILER_DSN_DEV permet d'en viser un autre (ex. smtp://host.docker.internal:1025)
+      MAILER_DSN: ${MAILER_DSN_DEV:-smtp://mailer:1025}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
 ###> doctrine/doctrine-bundle ###
   database:
     ports:

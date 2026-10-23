@@ -2,6 +2,40 @@
 # Les identifiants ci-dessous sont des valeurs de développement par défaut,
 # à surcharger via un fichier .env.local ou des variables d'environnement.
 services:
+  # Application Symfony servie par FrankenPHP (cible « prod » du Dockerfile ;
+  # compose.override.yaml bascule sur la cible « dev » avec le code monté).
+  # En production, fournir APP_SECRET (et les autres secrets) par l'environnement
+  # du serveur, par exemple dans un compose.prod.yaml non versionné.
+  app:
+    build:
+      context: .
+      target: prod
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER:-usr_expernet}:${MYSQL_PASSWORD:-app_dev_password}@database:3306/${MYSQL_DATABASE:-db_refonte_expernet}?serverVersion=8.4.0&charset=utf8mb4
+      MAILER_DSN: ${MAILER_DSN:-null://null}
+      DEFAULT_URI: ${DEFAULT_URI:-http://localhost}
+    depends_on:
+      database:
+        condition: service_healthy
+
+  # Envoi des e-mails en arrière-plan (file Messenger « async »)
+  worker:
+    build:
+      context: .
+      target: prod
+    restart: unless-stopped
+    command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600", "-vv"]
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER:-usr_expernet}:${MYSQL_PASSWORD:-app_dev_password}@database:3306/${MYSQL_DATABASE:-db_refonte_expernet}?serverVersion=8.4.0&charset=utf8mb4
+      MAILER_DSN: ${MAILER_DSN:-null://null}
+      RUN_MIGRATIONS: 0
+    healthcheck:
+      disable: true
+    depends_on:
+      app:
+        condition: service_started
+
 ###> doctrine/doctrine-bundle ###
   database:
     image: mysql:8.4
