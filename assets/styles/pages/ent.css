@@ -1,0 +1,69 @@
+/* Espace formation : connexion, double authentification et tableaux de bord. */
+
+.carte-connexion {
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+/* Listes de cours, d'examens et de demandes */
+.liste-creneaux > li {
+    padding-block: .85rem;
+    border-bottom: 1px solid var(--expernet-border);
+}
+
+.liste-creneaux > li:first-child {
+    padding-top: 0;
+}
+
+.liste-creneaux > li:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.chiffre-assiduite {
+    color: var(--expernet-primary-dark);
+    font-size: clamp(2.25rem, 1.8rem + 2vw, 3rem);
+    font-weight: 900;
+    line-height: 1;
+}
+
+/* Activation de la double authentification */
+.etapes {
+    padding-left: 1.25rem;
+}
+
+.etapes > li + li {
+    margin-top: 2rem;
+}
+
+.etapes > li::marker {
+    color: var(--expernet-primary-dark);
+    font-weight: 900;
+}
+
+.qr-code {
+    padding: .5rem;
+    background: var(--expernet-blanc);
+    border: 1px solid var(--expernet-border-strong);
+    border-radius: var(--expernet-radius-sm);
+}
+
+.cle-totp code {
+    color: var(--expernet-petrole);
+    font-size: 1.125rem;
+    letter-spacing: .08em;
+    word-break: break-all;
+}
+
+.champ-code {
+    max-width: 12rem;
+    font-size: 1.5rem;
+    letter-spacing: .3em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Indicateurs du tableau de bord (dl en grille : dt/dd restent dans un div direct) */
+.grille-indicateurs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+    gap: 1rem;
+}

@@ -38,6 +38,19 @@
     box-shadow: inset 0 0 0 1px var(--expernet-petrole);
 }
 
+/* États (texte + icône : l'information ne repose pas sur la couleur seule) */
+.badge-expernet--succes {
+    background: var(--expernet-success-bg);
+    color: var(--expernet-success);
+    box-shadow: inset 0 0 0 1px var(--expernet-success);
+}
+
+.badge-expernet--alerte {
+    background: var(--expernet-danger-bg);
+    color: var(--expernet-danger);
+    box-shadow: inset 0 0 0 1px var(--expernet-danger);
+}
+
 /* Alertes Bootstrap recolorées */
 .alert {
     --bs-alert-border-radius: var(--expernet-radius-sm);
@@ -103,11 +116,16 @@
     margin-bottom: 0;
 }
 
-.table-expernet th {
+/* En-têtes de colonnes sombres ; les en-têtes de ligne restent sur le fond du tableau. */
+.table-expernet thead th {
     background: var(--expernet-petrole);
     color: var(--expernet-blanc);
     font-weight: var(--expernet-poids-fort);
     white-space: nowrap;
+}
+
+.table-expernet tbody th {
+    color: var(--expernet-noir);
 }
 
 .table-responsive {

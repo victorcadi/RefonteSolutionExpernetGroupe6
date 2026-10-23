@@ -1,5 +1,16 @@
-# See the configuration reference at https://symfony.com/bundles/SchebTwoFactorBundle/6.x/configuration.html
+# Double authentification de l'espace formation (TOTP : application d'authentification).
+# https://symfony.com/bundles/SchebTwoFactorBundle/current/configuration.html
 scheb_two_factor:
     security_tokens:
         - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
         - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken
+    # Un code déjà utilisé est refusé pendant sa durée de validité (anti-rejeu).
+    code_reuse_cache: cache.app
+    code_reuse_cache_duration: 90
+    totp:
+        enabled: true
+        issuer: 'Expernet'
+        server_name: 'Espace formation'
+        # Tolère un décalage d'horloge de 15 secondes entre le serveur et le téléphone.
+        leeway: 15
+        template: 'ent/securite/code.html.twig'

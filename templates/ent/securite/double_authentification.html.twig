@@ -1,0 +1,52 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% block title %}{{ form.vars.submitted and not form.vars.valid ? 'Erreur – ' : '' }}Activer la double authentification{% endblock %}
+
+{% block contenu %}
+    <div class="row g-4 g-lg-5">
+        <div class="col-lg-7">
+            <h1>Activer la double authentification</h1>
+            <p class="texte-intro texte-lecture">
+                Pour protéger vos données de formation, chaque connexion à l’espace formation demande,
+                en plus du mot de passe, un code à usage unique fourni par une application de votre téléphone.
+            </p>
+
+            <ol class="etapes">
+                <li>
+                    <h2 class="h5">Installez une application d’authentification</h2>
+                    <p>Par exemple Google Authenticator, Microsoft Authenticator, FreeOTP ou l’application intégrée à votre gestionnaire de mots de passe.</p>
+                </li>
+                <li>
+                    <h2 class="h5">Ajoutez votre compte Expernet</h2>
+                    <p>Scannez le QR code ou, si vous ne pouvez pas le scanner, saisissez la clé ci-dessous dans l’application (type « basé sur le temps »).</p>
+                    <div class="d-flex flex-wrap align-items-center gap-4">
+                        <img src="{{ qr_code }}" width="220" height="220" class="qr-code"
+                             alt="QR code d’ajout du compte Expernet à une application d’authentification (même contenu que la clé de configuration)">
+                        <div>
+                            <p class="mb-1 fw-bold" id="libelle-cle">Clé de configuration</p>
+                            <p class="cle-totp mb-0" aria-labelledby="libelle-cle"><code>{{ secret_lisible }}</code></p>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <h2 class="h5">Confirmez avec un premier code</h2>
+                    {{ form_start(form, {attr: {'aria-label': 'Confirmer la double authentification'}}) }}
+                        {{ form_row(form.code) }}
+                        <button type="submit" class="btn btn-expernet-primary">{{ icone('check-circle-fill') }} Activer</button>
+                    {{ form_end(form) }}
+                </li>
+            </ol>
+        </div>
+
+        <aside class="col-lg-5" aria-labelledby="titre-aide-2fa">
+            <div class="encart section-claire h-auto">
+                <h2 id="titre-aide-2fa" class="h5 fw-bold">Besoin d’aide ?</h2>
+                <p>Gardez la clé de configuration en lieu sûr : elle permet de réinstaller le compte sur un nouveau téléphone.</p>
+                <p class="mb-0">
+                    En cas de perte de votre téléphone, contactez l’équipe pédagogique
+                    (<a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a>) pour réinitialiser la double authentification.
+                </p>
+            </div>
+        </aside>
+    </div>
+{% endblock %}

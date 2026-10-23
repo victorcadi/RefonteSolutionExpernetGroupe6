@@ -14,4 +14,5 @@ import './styles/components/feedback.css';
 import './styles/components/hero.css';
 import './styles/layouts/header.css';
 import './styles/layouts/footer.css';
+import './styles/pages/ent.css';
 import './styles/app.css';

@@ -1,0 +1,16 @@
+{#
+    Mise en page commune aux écrans de connexion (mot de passe, code, activation).
+    Paramètres : titre, intro (facultatif). Contenu : bloc « contenu » via embed.
+#}
+<div class="container-xl py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-6 col-xl-5">
+            <div class="encart carte-connexion">
+                <p class="surtitre mb-1">Espace formation</p>
+                <h1 class="h2">{{ titre }}</h1>
+                {% if intro is defined and intro %}<p>{{ intro }}</p>{% endif %}
+                {% block contenu %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>

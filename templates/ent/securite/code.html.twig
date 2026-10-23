@@ -1,0 +1,44 @@
+{#
+    Saisie du code de double authentification (gabarit du SchebTwoFactorBundle).
+#}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ authenticationError ? 'Erreur – ' : '' }}Code de vérification{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block body %}
+    {% embed 'security/_carte_connexion.html.twig' with {
+        titre: 'Code de vérification',
+        intro: 'Ouvrez votre application d’authentification et saisissez le code à 6 chiffres affiché pour Expernet.',
+    } %}
+        {% block contenu %}
+            {% if authenticationError %}
+                <div class="alert alert-danger" role="alert" id="erreur-code">
+                    {{ icone('x-circle-fill') }}
+                    <div>{{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}</div>
+                </div>
+            {% endif %}
+
+            <form method="post" action="{{ checkPathUrl ? checkPathUrl : path(checkPathRoute) }}" novalidate>
+                <div class="mb-4">
+                    <label class="form-label" for="code-verification">Code à 6 chiffres</label>
+                    <input type="text" class="form-control champ-code{{ authenticationError ? ' is-invalid' : '' }}"
+                           id="code-verification" name="{{ authCodeParameterName }}"
+                           inputmode="numeric" autocomplete="one-time-code" maxlength="6" required autofocus
+                           aria-describedby="aide-code{{ authenticationError ? ' erreur-code' : '' }}"
+                           {% if authenticationError %}aria-invalid="true"{% endif %}>
+                    <p id="aide-code" class="form-text mb-0">Le code change toutes les 30 secondes.</p>
+                </div>
+                {% if isCsrfProtectionEnabled %}
+                    <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
+                {% endif %}
+                <button class="btn btn-expernet-primary w-100" type="submit">Valider</button>
+            </form>
+
+            <p class="small mt-4 mb-0">
+                Vous n’avez plus accès à votre application ? Contactez l’équipe pédagogique, qui pourra réinitialiser la double authentification.
+                <a href="{{ logoutPath }}">Annuler et revenir à l’accueil</a>
+            </p>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

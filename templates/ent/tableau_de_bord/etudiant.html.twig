@@ -1,0 +1,150 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% block title %}Mon tableau de bord{% endblock %}
+
+{% block contenu %}
+    <h1>Bonjour {{ app.user.prenom }}</h1>
+
+    {% if promotion is null %}
+        <div class="alert alert-info" role="status">
+            {{ icone('info-circle-fill') }}
+            <div>Vous n’êtes rattaché(e) à aucune promotion pour le moment. Votre planning apparaîtra ici dès votre inscription.</div>
+        </div>
+    {% else %}
+        <p class="texte-intro">{{ promotion.nom }}{% if promotion.formation %} – {{ promotion.formation.intitule }}{% endif %}</p>
+
+        <div class="row g-4">
+            {# Journée en cours #}
+            <section class="col-lg-8" aria-labelledby="titre-aujourdhui">
+                <div class="encart">
+                    <h2 id="titre-aujourdhui" class="h4">Aujourd’hui, {{ maintenant|format_date('full', locale: 'fr') }}</h2>
+                    {% if aujourdhui is empty %}
+                        <p class="mb-0">Aucun cours aujourd’hui.</p>
+                    {% else %}
+                        <ul class="liste-sans-puce liste-creneaux mb-0">
+                            {% for creneau in aujourdhui %}
+                                {% set signe = signes[creneau.id] ?? false %}
+                                <li>
+                                    <p class="mb-1 fw-bold">
+                                        <time datetime="{{ creneau.debut|date('c') }}">{{ creneau.debut|date('H:i') }}</time>
+                                        – <time datetime="{{ creneau.fin|date('c') }}">{{ creneau.fin|date('H:i') }}</time>
+                                        · {{ creneau.intitule }}
+                                    </p>
+                                    <p class="mb-0 small">
+                                        {{ creneau.formateur ? 'Avec ' ~ creneau.formateur.nomComplet : '' }}{{ creneau.salle ? ' · ' ~ creneau.salle : '' }}
+                                    </p>
+                                    <p class="mb-0 mt-1">
+                                        {% if signe %}
+                                            <span class="badge-expernet badge-expernet--succes">{{ icone('check-circle-fill') }} Émargement signé</span>
+                                        {% elseif creneau.fin < maintenant %}
+                                            <span class="badge-expernet badge-expernet--alerte">{{ icone('exclamation-triangle-fill') }} Non signé</span>
+                                        {% else %}
+                                            <span class="badge-expernet">Émargement à signer pendant le cours</span>
+                                        {% endif %}
+                                    </p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </section>
+
+            {# Assiduité #}
+            <section class="col-lg-4" aria-labelledby="titre-assiduite">
+                <div class="encart section-claire">
+                    <h2 id="titre-assiduite" class="h4">Mon assiduité</h2>
+                    {% set taux = assiduite.taux %}
+                    {% if taux is null %}
+                        <p class="mb-0">Aucun cours terminé pour le moment.</p>
+                    {% else %}
+                        <p class="chiffre-assiduite mb-1">{{ taux|number_format(taux == taux|round ? 0 : 1, ',', ' ') }} %</p>
+                        <p class="mb-2">de présence : {{ assiduite.presences }} cours émargé{{ assiduite.presences > 1 ? 's' : '' }} sur {{ assiduite.creneauxTermines }}.</p>
+                        {% if assiduite.estEnAlerte %}
+                            <p class="mb-0 text-danger-emphasis fw-bold">
+                                {{ icone('exclamation-triangle-fill') }} Votre assiduité est inférieure à {{ constant('App\\Service\\Ent\\Assiduite::SEUIL_ALERTE')|number_format }} %. Contactez votre formateur référent.
+                            </p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </section>
+
+            {# Prochains cours #}
+            <section class="col-lg-6" aria-labelledby="titre-prochains">
+                <div class="encart">
+                    <h2 id="titre-prochains" class="h4">Prochains cours</h2>
+                    {% if prochains is empty %}
+                        <p class="mb-0">Aucun cours programmé dans les deux prochaines semaines.</p>
+                    {% else %}
+                        <ul class="liste-sans-puce liste-creneaux mb-0">
+                            {% for creneau in prochains %}
+                                <li>
+                                    <p class="mb-0 fw-bold">
+                                        <time datetime="{{ creneau.debut|date('c') }}">{{ creneau.debut|format_datetime('full', 'none', locale: 'fr')|capitalize }}</time>
+                                    </p>
+                                    <p class="mb-0 small">{{ creneau.debut|date('H:i') }} – {{ creneau.fin|date('H:i') }} · {{ creneau.intitule }}{{ creneau.salle ? ' · ' ~ creneau.salle : '' }}</p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </section>
+
+            {# Examens #}
+            <section class="col-lg-6" aria-labelledby="titre-examens">
+                <div class="encart">
+                    <h2 id="titre-examens" class="h4">Examens à venir</h2>
+                    {% if examens is empty %}
+                        <p class="mb-0">Aucun examen programmé.</p>
+                    {% else %}
+                        <ul class="liste-sans-puce liste-creneaux mb-0">
+                            {% for examen in examens %}
+                                <li>
+                                    <p class="mb-0 fw-bold">{{ examen.intitule }}</p>
+                                    <p class="mb-0 small">
+                                        {{ examen.type.libelle }} ·
+                                        <time datetime="{{ examen.dateExamen|date('c') }}">{{ examen.dateExamen|format_datetime('long', 'short', locale: 'fr') }}</time>
+                                        {{ examen.site ? ' · ' ~ examen.site.nom : '' }}{{ examen.salle ? ', ' ~ examen.salle : '' }}
+                                    </p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </section>
+
+            {# Notes #}
+            <section class="col-12" aria-labelledby="titre-notes">
+                <div class="encart">
+                    <h2 id="titre-notes" class="h4">Dernières notes</h2>
+                    {% if notes is empty %}
+                        <p class="mb-0">Aucune note pour le moment.</p>
+                    {% else %}
+                        <div class="table-responsive" tabindex="0" role="region" aria-labelledby="legende-notes">
+                            <table class="table table-striped table-expernet align-middle mb-0">
+                                <caption id="legende-notes" class="visually-hidden">Mes dernières notes</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Évaluation</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Formateur</th>
+                                        <th scope="col" class="text-end">Note sur 20</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for note in notes %}
+                                        <tr>
+                                            <th scope="row" class="fw-normal">{{ note.intitule }}</th>
+                                            <td><time datetime="{{ note.date|date('Y-m-d') }}">{{ note.date|date('d/m/Y') }}</time></td>
+                                            <td>{{ note.formateur ? note.formateur.nomComplet : '–' }}</td>
+                                            <td class="text-end fw-bold">{{ note.valeur|number_format(2, ',', ' ')|replace({',00': ''}) }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    {% endif %}
+{% endblock %}

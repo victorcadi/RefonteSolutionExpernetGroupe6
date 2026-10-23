@@ -1,0 +1,50 @@
+{#
+    Gabarit des pages de l'espace formation : sous-navigation propre au rôle
+    (bandeau rose clair de la maquette) sous l'en-tête commun du site.
+#}
+{% extends 'base.html.twig' %}
+
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block body_class %}ent{% endblock %}
+
+{% block sous_navigation %}
+    {% set route = app.current_route %}
+    {% set liens = [] %}
+    {% if is_granted('ROLE_ADMIN') %}
+        {% set liens = liens|merge([{route: 'app_ent_admin', libelle: 'Administration', icone: 'shield-lock-fill'}]) %}
+    {% endif %}
+    {% if is_granted('ROLE_FORMATEUR') %}
+        {% set liens = liens|merge([{route: 'app_ent_formateur', libelle: 'Mes promotions', icone: 'person-workspace'}]) %}
+    {% endif %}
+    {% if is_granted('ROLE_ETUDIANT') %}
+        {% set liens = liens|merge([{route: 'app_ent_etudiant', libelle: 'Mon tableau de bord', icone: 'house-door-fill'}]) %}
+    {% endif %}
+    {% set liens = liens|merge([{route: 'app_ent_double_authentification', libelle: 'Sécurité du compte', icone: 'shield-lock-fill'}]) %}
+
+    <nav class="ent-nav" aria-label="Espace formation">
+        <div class="container-xl d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <ul class="nav">
+                {% for lien in liens %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path(lien.route) }}"{% if route == lien.route %} aria-current="page"{% endif %}>
+                            {{ icone(lien.icone) }} {{ lien.libelle }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="d-flex flex-wrap align-items-center gap-3 py-2">
+                <p class="mb-0 small">
+                    Connecté(e) : <strong>{{ app.user.nomComplet }}</strong>
+                    <span class="badge-expernet ms-1">{{ app.user.role.libelle }}</span>
+                </p>
+                <a class="btn btn-expernet-secondary btn-sm" href="{{ logout_path() }}">{{ icone('box-arrow-right') }} Se déconnecter</a>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block body %}
+    <div class="container-xl py-4 py-lg-5">
+        {% block contenu %}{% endblock %}
+    </div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% block title %}Administration{% endblock %}
+
+{% block contenu %}
+    <h1>Administration</h1>
+
+    <section aria-labelledby="titre-chiffres" class="mb-4">
+        <h2 id="titre-chiffres" class="visually-hidden">Chiffres clés</h2>
+        <dl class="grille-indicateurs mb-0">
+            {% for indicateur in [
+                {libelle: 'Étudiants actifs', valeur: comptes['Etudiant'] ?? 0},
+                {libelle: 'Formateurs actifs', valeur: comptes['Formateur'] ?? 0},
+                {libelle: 'Promotions', valeur: nombre_promotions},
+                {libelle: 'Demandes à traiter', valeur: nombre_demandes},
+                {libelle: 'Candidatures à traiter', valeur: nombre_candidatures},
+            ] %}
+                <div class="chiffre-cle encart">
+                    <dt>{{ indicateur.libelle }}</dt>
+                    <dd>{{ indicateur.valeur }}</dd>
+                </div>
+            {% endfor %}
+        </dl>
+    </section>
+
+    <div class="row g-4">
+        <section class="col-lg-6" aria-labelledby="titre-demandes">
+            <div class="encart">
+                <h2 id="titre-demandes" class="h4">Dernières demandes reçues</h2>
+                {% if demandes is empty %}
+                    <p class="mb-0">Aucune demande en attente.</p>
+                {% else %}
+                    <ul class="liste-sans-puce liste-creneaux mb-0">
+                        {% for demande in demandes %}
+                            <li>
+                                <p class="mb-0 fw-bold">{{ demande.nomComplet }} – {{ demande.type.libelle }}</p>
+                                <p class="mb-0 small">
+                                    <time datetime="{{ demande.createdAt|date('c') }}">{{ demande.createdAt|date('d/m/Y à H:i') }}</time>
+                                    {{ demande.formation ? ' · ' ~ demande.formation.intitule : '' }}
+                                </p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="col-lg-6" aria-labelledby="titre-candidatures">
+            <div class="encart">
+                <h2 id="titre-candidatures" class="h4">Dernières candidatures</h2>
+                {% if candidatures is empty %}
+                    <p class="mb-0">Aucune candidature en attente.</p>
+                {% else %}
+                    <ul class="liste-sans-puce liste-creneaux mb-0">
+                        {% for candidature in candidatures %}
+                            <li>
+                                <p class="mb-0 fw-bold">{{ candidature.candidat.nomComplet }}</p>
+                                <p class="mb-0 small">
+                                    <time datetime="{{ candidature.createdAt|date('c') }}">{{ candidature.createdAt|date('d/m/Y à H:i') }}</time>
+                                    · {{ candidature.formation.intitule }}
+                                </p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+{% endblock %}

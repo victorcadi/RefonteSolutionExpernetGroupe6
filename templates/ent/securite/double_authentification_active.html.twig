@@ -1,0 +1,18 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% block title %}Sécurité du compte{% endblock %}
+
+{% block contenu %}
+    <h1>Sécurité du compte</h1>
+    <div class="encart section-claire texte-lecture">
+        <p class="d-flex gap-2 align-items-start mb-3">
+            {{ icone('check-circle-fill', 'text-success fs-4') }}
+            <span><strong>La double authentification est activée.</strong> Le code de votre application vous est demandé à chaque connexion.</span>
+        </p>
+        <p class="mb-0">
+            Nouveau téléphone ou application perdue ? Contactez l’équipe pédagogique
+            (<a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a>) : elle réinitialisera la double authentification
+            et vous pourrez l’activer à nouveau.
+        </p>
+    </div>
+{% endblock %}

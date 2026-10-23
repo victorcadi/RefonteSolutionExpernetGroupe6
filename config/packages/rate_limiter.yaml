@@ -5,6 +5,11 @@ framework:
             policy: sliding_window
             limit: 5
             interval: '15 minutes'
+        # Codes de double authentification : 5 essais par quart d'heure et par compte.
+        double_authentification:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'
 
 # En test, compteurs en mémoire : remis à zéro à chaque redémarrage du noyau
 # (donc à chaque requête, sauf client sans redémarrage).
@@ -14,8 +19,18 @@ when@test:
             class: Symfony\Component\RateLimiter\Storage\InMemoryStorage
 
     framework:
+        cache:
+            pools:
+                # Compteurs des essais de connexion : en mémoire, sans effet d'une exécution à l'autre.
+                cache.rate_limiter:
+                    adapter: cache.adapter.array
         rate_limiter:
             formulaire_public:
+                policy: sliding_window
+                limit: 5
+                interval: '15 minutes'
+                storage_service: limiteur.stockage_test
+            double_authentification:
                 policy: sliding_window
                 limit: 5
                 interval: '15 minutes'

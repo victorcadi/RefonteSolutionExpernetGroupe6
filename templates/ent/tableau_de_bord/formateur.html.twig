@@ -1,0 +1,73 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% block title %}Mes promotions{% endblock %}
+
+{% block contenu %}
+    <h1>Bonjour {{ app.user.prenom }}</h1>
+
+    <div class="row g-4">
+        <section class="col-lg-7" aria-labelledby="titre-cours">
+            <div class="encart">
+                <h2 id="titre-cours" class="h4">Mes prochains cours</h2>
+                {% if creneaux is empty %}
+                    <p class="mb-0">Aucun cours programmé.</p>
+                {% else %}
+                    <ul class="liste-sans-puce liste-creneaux mb-0">
+                        {% for creneau in creneaux %}
+                            <li>
+                                <p class="mb-0 fw-bold">
+                                    <time datetime="{{ creneau.debut|date('c') }}">{{ creneau.debut|format_datetime('full', 'none', locale: 'fr')|capitalize }}</time>,
+                                    {{ creneau.debut|date('H:i') }} – {{ creneau.fin|date('H:i') }}
+                                    {% if creneau.debut <= maintenant and creneau.fin > maintenant %}<span class="badge-expernet badge-expernet--succes ms-1">En cours</span>{% endif %}
+                                </p>
+                                <p class="mb-0 small">{{ creneau.intitule }} · {{ creneau.promotion.nom }}{{ creneau.salle ? ' · ' ~ creneau.salle : '' }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="col-lg-5" aria-labelledby="titre-promotions">
+            <div class="encart section-claire">
+                <h2 id="titre-promotions" class="h4">Promotions suivies</h2>
+                {% if promotions is empty %}
+                    <p class="mb-0">Aucune promotion.</p>
+                {% else %}
+                    <ul class="liste-sans-puce liste-creneaux mb-0">
+                        {% for promotion in promotions %}
+                            <li>
+                                <p class="mb-0 fw-bold">{{ promotion.nom }}</p>
+                                <p class="mb-0 small">
+                                    {{ promotion.etudiants|length }} étudiant{{ promotion.etudiants|length > 1 ? 's' : '' }}
+                                    {% if promotion.formateurReferent == app.user %} · vous êtes référent(e){% endif %}
+                                </p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="col-12" aria-labelledby="titre-jurys">
+            <div class="encart">
+                <h2 id="titre-jurys" class="h4">Jurys d’examen</h2>
+                {% if jurys is empty %}
+                    <p class="mb-0">Vous ne siégez dans aucun jury à venir.</p>
+                {% else %}
+                    <ul class="liste-sans-puce liste-creneaux mb-0">
+                        {% for examen in jurys %}
+                            <li>
+                                <p class="mb-0 fw-bold">{{ examen.intitule }}</p>
+                                <p class="mb-0 small">
+                                    {{ examen.promotion.nom }} ·
+                                    <time datetime="{{ examen.dateExamen|date('c') }}">{{ examen.dateExamen|format_datetime('long', 'short', locale: 'fr') }}</time>
+                                </p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+{% endblock %}

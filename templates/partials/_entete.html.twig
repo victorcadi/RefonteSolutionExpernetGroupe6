@@ -44,9 +44,15 @@
                     </button>
                 </form>
 
-                <a class="btn btn-expernet-light" href="{{ path('app_login') }}">
-                    {{ icone('person-circle') }} Espace formation
-                </a>
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                    <a class="btn btn-expernet-light" href="{{ path('app_ent_accueil') }}"{% if route starts with 'app_ent_' %} aria-current="page"{% endif %}>
+                        {{ icone('person-circle') }} Mon espace
+                    </a>
+                {% else %}
+                    <a class="btn btn-expernet-light" href="{{ path('app_login') }}">
+                        {{ icone('person-circle') }} Espace formation
+                    </a>
+                {% endif %}
             </div>
         </div>
     </nav>
