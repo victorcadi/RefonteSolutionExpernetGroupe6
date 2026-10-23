@@ -3,12 +3,13 @@
 {% set liens = [
     {route: 'app_catalogue', params: {univers: 'continue'}, libelle: 'Formations continues', actif: univers_courant == 'continue'},
     {route: 'app_catalogue', params: {univers: 'alternance'}, libelle: 'Formations en alternance', actif: univers_courant == 'alternance'},
+    {route: 'app_contact', params: {}, libelle: 'Contact', actif: route == 'app_contact'},
 ] %}
 
 <header class="entete theme-sombre">
-    <nav class="navbar navbar-expand-lg" aria-label="Navigation principale">
+    <nav class="navbar navbar-expand-xl" aria-label="Navigation principale">
         <div class="container-xl">
-            <a class="navbar-brand py-0 me-lg-4" href="{{ path('app_accueil') }}">
+            <a class="navbar-brand py-0 me-xl-4" href="{{ path('app_accueil') }}">
                 <img src="{{ asset('img/logo-expernet-blanc.webp') }}" width="360" height="263"
                      alt="Expernet, Informatique & Marketing digital – retour à l’accueil">
             </a>
@@ -21,7 +22,7 @@
             </button>
 
             <div class="collapse navbar-collapse" id="menu-principal">
-                <ul class="navbar-nav me-auto mb-3 mb-lg-0 gap-lg-2">
+                <ul class="navbar-nav me-auto mb-3 mb-xl-0 gap-xl-2">
                     {% for lien in liens %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path(lien.route, lien.params) }}"{% if lien.actif %} aria-current="page"{% endif %}>
@@ -31,7 +32,7 @@
                     {% endfor %}
                 </ul>
 
-                <form class="recherche-entete d-flex mb-3 mb-lg-0 me-lg-3" role="search"
+                <form class="recherche-entete d-flex mb-3 mb-xl-0 me-xl-3" role="search"
                       action="{{ path('app_catalogue') }}" method="get">
                     <label for="recherche-entete" class="visually-hidden">Rechercher une formation</label>
                     <input class="form-control" type="search" id="recherche-entete" name="q"

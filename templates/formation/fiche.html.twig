@@ -5,6 +5,9 @@
 {% set sessions = formation.sessionsAVenir %}
 {% set prochaine = sessions|first ?: null %}
 {% set url_catalogue = path('app_catalogue', {univers: univers}) %}
+{% set url_demande = alternance
+    ? path('app_candidature', {formation: formation.slug})
+    : path('app_devis', {formation: formation.slug}) %}
 
 {% block title %}{{ formation.intitule }} – {{ alternance ? 'formation en alternance' : 'formation continue' }}{% endblock %}
 {% block meta_description %}{{ formation.resume }}{% endblock %}
@@ -51,7 +54,7 @@
                     {% endif %}
 
                     <div class="d-flex flex-wrap gap-2 mt-4">
-                        <a class="btn btn-expernet-primary" href="#demande">
+                        <a class="btn btn-expernet-primary" href="{{ url_demande }}">
                             {{ alternance ? 'Candidater' : 'Demander un devis' }} {{ icone('arrow-right') }}
                         </a>
                         <a class="btn btn-expernet-secondary" href="{{ path('app_formation_programme', {univers: univers, slug: formation.slug}) }}">
@@ -210,16 +213,28 @@
         </div>
     </section>
 
-    {# Demande (devis ou candidature) — formulaire ajouté avec le module de demandes #}
-    <section id="demande" class="section" aria-labelledby="titre-demande" tabindex="-1">
+    {# Appel à l'action (maquette : « Demander un devis » / « Inscription ») #}
+    <section class="section" aria-labelledby="titre-demande">
         <div class="container-xl">
-            <h2 id="titre-demande" class="section-titre text-center">{{ alternance ? 'Candidater' : 'Demander un devis' }}</h2>
-            {% block demande %}
-                <p class="text-center mb-0">
-                    Appelez-nous au <a href="tel:{{ expernet.telephone_international }}">{{ expernet.telephone }}</a>
-                    ou écrivez-nous à <a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a>.
+            <div class="encart section-bleue text-center">
+                <h2 id="titre-demande" class="section-titre">{{ alternance ? 'Prêt à vous lancer ?' : 'Cette formation vous intéresse ?' }}</h2>
+                <p class="texte-lecture mx-auto">
+                    {% if alternance %}
+                        Envoyez votre candidature en quelques minutes : nous étudions votre dossier puis nous vous proposons un entretien.
+                    {% else %}
+                        Demandez un devis pour votre entreprise ou inscrivez-vous à une prochaine session.
+                    {% endif %}
                 </p>
-            {% endblock %}
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a class="btn btn-expernet-primary" href="{{ url_demande }}">{{ alternance ? 'Candidater' : 'Demander un devis' }} {{ icone('arrow-right') }}</a>
+                    {% if not alternance %}
+                        <a class="btn btn-expernet-secondary" href="{{ path('app_candidature', {formation: formation.slug}) }}">S’inscrire à une session</a>
+                    {% endif %}
+                </div>
+                <p class="mt-3 mb-0">
+                    Ou appelez-nous au <a href="tel:{{ expernet.telephone_international }}">{{ expernet.telephone }}</a>.
+                </p>
+            </div>
         </div>
     </section>
 

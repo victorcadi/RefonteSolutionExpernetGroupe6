@@ -25,8 +25,10 @@
     height: 3.5rem;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1200px) {
     .entete .navbar-brand img { height: 4.25rem; }
+    .entete .nav-link,
+    .entete .btn { white-space: nowrap; }
 }
 
 .entete .nav-link {
@@ -64,11 +66,15 @@
 }
 
 @media (min-width: 1200px) {
+    .recherche-entete { width: 11rem; }
+}
+
+@media (min-width: 1400px) {
     .recherche-entete { width: 17rem; }
 }
 
-/* Menu mobile : panneau déroulant lisible */
-@media (max-width: 991.98px) {
+/* Menu replié (< 1200 px) : panneau déroulant lisible */
+@media (max-width: 1199.98px) {
     .entete .navbar-collapse {
         margin-top: .75rem;
         padding-block: .5rem 1rem;
