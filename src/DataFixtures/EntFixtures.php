@@ -11,6 +11,7 @@ use App\Entity\Promotion;
 use App\Entity\Session;
 use App\Entity\Site;
 use App\Entity\Utilisateur;
+use App\Enum\ModeSignature;
 use App\Enum\RoleUtilisateur;
 use App\Enum\TypeExamen;
 use App\Service\Emargement\EmpreinteEmargement;
@@ -106,6 +107,7 @@ class EntFixtures extends Fixture implements DependentFixtureInterface
         $maintenant = new \DateTimeImmutable();
         $lundi = (new \DateTimeImmutable('monday this week'))->modify('-4 weeks');
 
+        $creneaux = [];
         for ($jour = 0; $jour < 42; ++$jour) {
             $date = $lundi->modify("+{$jour} days");
             if ((int) $date->format('N') > 5) {
@@ -121,27 +123,36 @@ class EntFixtures extends Fixture implements DependentFixtureInterface
                     ->setDebut(new \DateTimeImmutable($date->format('Y-m-d').' '.$debut))
                     ->setFin(new \DateTimeImmutable($date->format('Y-m-d').' '.$fin));
                 $manager->persist($creneau);
+                $creneaux[] = [$creneau, $jour, $j];
+            }
+        }
 
-                if ($creneau->getFin() >= $maintenant) {
+        // Le sceau inclut les identifiants : créneaux et comptes doivent être enregistrés avant.
+        $manager->flush();
+
+        foreach ($creneaux as [$creneau, $jour, $j]) {
+            if ($creneau->getFin() >= $maintenant) {
+                continue;
+            }
+
+            // Créneaux passés : la plupart des étudiants ont signé.
+            // L'étudiant n°5 est souvent absent pour illustrer l'alerte d'absentéisme ;
+            // l'étudiante n°4 signe en saisissant son nom (alternative au tracé).
+            foreach ($etudiants as $k => $etudiant) {
+                $absent = (4 === $k && 0 !== $jour % 3) || (0 === ($jour * 7 + $k * 3 + $j) % 23);
+                if ($absent) {
                     continue;
                 }
-
-                // Créneaux passés : la plupart des étudiants ont signé.
-                // L'étudiant n°5 est souvent absent pour illustrer l'alerte d'absentéisme.
-                foreach ($etudiants as $k => $etudiant) {
-                    $absent = (4 === $k && 0 !== $jour % 3) || (0 === ($jour * 7 + $k * 3 + $j) % 23);
-                    if ($absent) {
-                        continue;
-                    }
-                    $emargement = (new Emargement())
-                        ->setCreneau($creneau)
-                        ->setEtudiant($etudiant)
-                        ->setSigneLe($creneau->getDebut()->modify('+'.(5 + $k).' minutes'))
-                        ->setSignature(self::SIGNATURE_DEMO)
-                        ->setAdresseIp('127.0.0.1');
-                    $emargement->setEmpreinte($this->empreinte->calculer($emargement));
-                    $manager->persist($emargement);
-                }
+                $saisie = 3 === $k;
+                $emargement = (new Emargement())
+                    ->setCreneau($creneau)
+                    ->setEtudiant($etudiant)
+                    ->setSigneLe($creneau->getDebut()->modify('+'.(5 + $k).' minutes'))
+                    ->setMode($saisie ? ModeSignature::Saisie : ModeSignature::Manuscrite)
+                    ->setSignature($saisie ? $etudiant->getNomComplet() : $this->signatureDemo($k))
+                    ->setAdresseIp('127.0.0.1');
+                $this->empreinte->sceller($emargement);
+                $manager->persist($emargement);
             }
         }
     }
@@ -186,6 +197,36 @@ class EntFixtures extends Fixture implements DependentFixtureInterface
         $this->getReference(CatalogueFixtures::FORMATION_CDA, Formation::class);
     }
 
-    /** Petite image PNG transparente utilisée comme signature de démonstration. */
-    private const SIGNATURE_DEMO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+    /** @var array<int, string> */
+    private array $signatures = [];
+
+    /**
+     * Tracé de démonstration (courbe propre à chaque étudiant), généré avec GD.
+     */
+    private function signatureDemo(int $graine): string
+    {
+        if (isset($this->signatures[$graine])) {
+            return $this->signatures[$graine];
+        }
+
+        $image = imagecreatetruecolor(360, 120);
+        imagesavealpha($image, true);
+        imagefill($image, 0, 0, imagecolorallocatealpha($image, 255, 255, 255, 127));
+        $encre = imagecolorallocate($image, 15, 58, 75);
+        imagesetthickness($image, 3);
+
+        $precedent = null;
+        for ($x = 20; $x <= 340; $x += 4) {
+            $y = (int) (60 + 28 * sin(($x + 17 * $graine) / (18 + 3 * $graine)) + 10 * sin($x / 7));
+            if (null !== $precedent) {
+                imageline($image, $precedent[0], $precedent[1], $x, $y, $encre);
+            }
+            $precedent = [$x, $y];
+        }
+
+        ob_start();
+        imagepng($image);
+
+        return $this->signatures[$graine] = 'data:image/png;base64,'.base64_encode((string) ob_get_clean());
+    }
 }

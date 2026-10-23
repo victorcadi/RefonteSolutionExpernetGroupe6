@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\ModeSignature;
 use App\Repository\EmargementRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -33,7 +34,10 @@ class Emargement
     #[ORM\Column]
     private ?\DateTimeImmutable $signeLe = null;
 
-    /** Image PNG de la signature manuscrite, encodée en data URL. */
+    #[ORM\Column(length: 20, enumType: ModeSignature::class, options: ['default' => 'manuscrite'])]
+    private ModeSignature $mode = ModeSignature::Manuscrite;
+
+    /** Signature tracée (image PNG en data URL) ou nom saisi, selon le mode. */
     #[ORM\Column(type: Types::TEXT)]
     private ?string $signature = null;
 
@@ -80,6 +84,18 @@ class Emargement
     public function setSigneLe(\DateTimeImmutable $signeLe): static
     {
         $this->signeLe = $signeLe;
+
+        return $this;
+    }
+
+    public function getMode(): ModeSignature
+    {
+        return $this->mode;
+    }
+
+    public function setMode(ModeSignature $mode): static
+    {
+        $this->mode = $mode;
 
         return $this;
     }
