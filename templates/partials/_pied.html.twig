@@ -1,0 +1,89 @@
+<footer class="pied" aria-labelledby="pied-titre">
+    <h2 id="pied-titre" class="visually-hidden">Informations sur Expernet</h2>
+    <div class="container-xl py-5">
+        <div class="row g-5">
+            <section class="col-md-6 col-lg-4" aria-labelledby="pied-certification">
+                <h2 id="pied-certification">Expernet est certifié</h2>
+                <img src="{{ asset('img/qualiopi-processus-certifie.webp') }}" width="360" height="210" loading="lazy"
+                     class="pied-qualiopi img-fluid mb-3"
+                     alt="Qualiopi – processus certifié – République française">
+                <p>{{ expernet.certification_qualiopi }}</p>
+                {% if expernet.certificat_qualiopi_pdf %}
+                    <a class="btn btn-expernet-primary mb-4" href="{{ asset('documents/' ~ expernet.certificat_qualiopi_pdf) }}">
+                        {{ icone('file-earmark-pdf-fill') }} Certificat Qualiopi <span class="visually-hidden">(PDF)</span>
+                    </a>
+                {% endif %}
+
+                <p class="pied-contact mb-2">
+                    {{ icone('telephone-fill') }}
+                    <a href="tel:{{ expernet.telephone_international }}">{{ expernet.telephone }}</a>
+                </p>
+                <p class="pied-contact">
+                    {{ icone('envelope-fill') }}
+                    <a href="mailto:{{ expernet.email }}">{{ expernet.email }}</a>
+                </p>
+                {% if expernet.livret_accueil_pdf %}
+                    <a class="btn btn-expernet-primary mt-2" href="{{ asset('documents/' ~ expernet.livret_accueil_pdf) }}">
+                        {{ icone('download') }} Télécharger le livret d’accueil <span class="visually-hidden">(PDF)</span>
+                    </a>
+                {% endif %}
+            </section>
+
+            <section class="col-md-6 col-lg-5" aria-labelledby="pied-accessibilite">
+                <h2 id="pied-accessibilite">Accessibilité</h2>
+                <p class="fw-bold">Nos établissements sont accessibles aux personnes à mobilité réduite et aux personnes en situation de handicap. Des places de stationnement leur sont réservées.</p>
+                <p>Pour toute question sur l’accueil des personnes en situation de handicap, contactez notre référente handicap :</p>
+                <p>
+                    <strong>{{ expernet.referente_handicap.nom }}</strong><br>
+                    <a href="tel:{{ expernet.telephone_international }}">{{ expernet.referente_handicap.telephone }}</a><br>
+                    <a href="mailto:{{ expernet.referente_handicap.email }}">{{ expernet.referente_handicap.email }}</a>
+                </p>
+
+                {% set sites = expernet_sites() %}
+                {% if sites is not empty %}
+                    <h3 class="h6 fw-bold mt-4">Nos locaux</h3>
+                    <ul class="pied-locaux liste-sans-puce">
+                        {% for site in sites %}
+                            <li>
+                                {{ icone('geo-alt-fill', 'mt-1') }}
+                                <address class="mb-0">
+                                    {{ site.adresse }}, {{ site.codePostal }} {{ site.ville|upper }}
+                                    {% if site.complementAdresse %}<br><span class="text-body-secondary">{{ site.complementAdresse }}</span>{% endif %}
+                                </address>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </section>
+
+            <div class="col-lg-3">
+                <nav aria-labelledby="pied-formations">
+                    <h2 id="pied-formations">Formations</h2>
+                    <ul class="liste-sans-puce">
+                        <li class="mb-2"><a href="{{ path('app_catalogue', {univers: 'continue'}) }}">Formations continues</a></li>
+                        <li class="mb-2"><a href="{{ path('app_catalogue', {univers: 'alternance'}) }}">Formations en alternance</a></li>
+                        <li class="mb-2"><a href="{{ path('app_catalogue') }}">Tout le catalogue</a></li>
+                    </ul>
+                </nav>
+
+                {% set reseaux = expernet.reseaux_sociaux|filter(url => url is not null) %}
+                {% if reseaux is not empty %}
+                    <section class="mt-4" aria-labelledby="pied-reseaux">
+                        <h2 id="pied-reseaux">Réseaux sociaux</h2>
+                        <ul class="pied-reseaux liste-sans-puce d-flex gap-2">
+                            {% for nom, url in reseaux %}
+                                <li><a href="{{ url }}" rel="noopener">{{ icone(nom, '', 'Expernet sur ' ~ nom|capitalize) }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="pied-bas">
+        <div class="container-xl py-3 d-flex flex-wrap justify-content-between gap-2">
+            <p class="mb-0">© {{ 'now'|date('Y') }} Expernet</p>
+        </div>
+    </div>
+</footer>

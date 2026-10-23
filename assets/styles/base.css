@@ -117,10 +117,17 @@ a {
     opacity: .55;
 }
 
-.section > .container {
+.section > .container,
+.section > .container-xl {
     position: relative;
     z-index: 1;
 }
+
+/* Placements prédéfinis (pas de style en ligne dans les templates) */
+.forme-deco--haut-gauche { width: 24rem; top: -6rem; left: -8rem; }
+.forme-deco--droite { width: clamp(14rem, 30vw, 26rem); top: 40%; right: -6rem; }
+.forme-deco--gauche { width: 22rem; top: 2rem; left: -9rem; }
+.forme-deco--bas-droite { width: 18rem; bottom: -6rem; right: -5rem; }
 
 @media (max-width: 575.98px) {
     .forme-deco { display: none; }

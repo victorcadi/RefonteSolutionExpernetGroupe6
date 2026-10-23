@@ -1,26 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('styles/bootstrap.css') }}">
-        {% endblock %}
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% set titre_page = block('title') is defined and block('title')|trim is not empty ? block('title')|trim : null %}
+        <title>{{ titre_page ? titre_page ~ ' | ' : '' }}Expernet – Formation Informatique & Marketing Digital</title>
+        <meta name="description" content="{% block meta_description %}{{ expernet.accroche }}. Formations continues, formations en alternance et certifications professionnelles.{% endblock %}">
+        {% block robots %}{% endblock %}
+        <link rel="canonical" href="{% block canonical %}{{ url(app.current_route ?? 'app_accueil', app.current_route_parameters ?? {}) }}{% endblock %}">
 
+        <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+        <meta property="og:site_name" content="Expernet">
+        <meta property="og:locale" content="fr_FR">
+        <meta property="og:title" content="{{ titre_page ?? 'Expernet – Formation Informatique & Marketing Digital' }}">
+        <meta property="og:description" content="{{ block('meta_description')|trim }}">
+        <meta property="og:url" content="{{ block('canonical')|trim }}">
+        <meta property="og:image" content="{{ absolute_url(asset('favicon-512.png')) }}">
+
+        <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48">
+        <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+        <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+        <link rel="preload" href="{{ asset('fonts/nunito-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+        <meta name="theme-color" content="#0071A3">
+
+        {% block stylesheets %}{% endblock %}
         {% block javascripts %}
-            <script src="{{ asset('bootstrap.js') }}" defer></script>
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
 
-        {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
-        {% if frankenphp_hot_reload %}
-        <meta name="frankenphp-hot-reload:url" content="{{ frankenphp_hot_reload }}">
-        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
-        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
-        {% endif %}
+        {% block donnees_structurees %}
+            {{ include('partials/_jsonld_organisation.html.twig') }}
+        {% endblock %}
     </head>
-    <body>
-        {% block body %}{% endblock %}
+    <body class="{% block body_class %}{% endblock %}">
+        <a class="lien-evitement" href="#contenu">Aller au contenu</a>
+
+        {% if expernet_demo %}
+            {{ include('partials/_bandeau_demo.html.twig') }}
+        {% endif %}
+
+        {% block entete %}
+            {{ include('partials/_entete.html.twig') }}
+        {% endblock %}
+
+        {% block sous_navigation %}{% endblock %}
+
+        <main id="contenu" tabindex="-1">
+            {{ include('partials/_flashes.html.twig') }}
+            {% block body %}{% endblock %}
+        </main>
+
+        {% block pied %}
+            {{ include('partials/_pied.html.twig') }}
+        {% endblock %}
     </body>
 </html>

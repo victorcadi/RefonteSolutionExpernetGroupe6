@@ -1,0 +1,27 @@
+{#
+    Fil d'Ariane accessible + données structurées BreadcrumbList.
+    Paramètre : elements = liste de {libelle, url} ; le dernier élément est la page courante (url facultative).
+#}
+<nav aria-label="Fil d’Ariane">
+    <ol class="breadcrumb">
+        {% for element in elements %}
+            {% if loop.last %}
+                <li class="breadcrumb-item active" aria-current="page">{{ element.libelle }}</li>
+            {% else %}
+                <li class="breadcrumb-item"><a href="{{ element.url }}">{{ element.libelle }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+</nav>
+<script type="application/ld+json">
+{{ {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: elements|map((element, i) => {
+        '@type': 'ListItem',
+        position: i + 1,
+        name: element.libelle,
+        item: element.url ?? app.request.uri,
+    }),
+}|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}
+</script>

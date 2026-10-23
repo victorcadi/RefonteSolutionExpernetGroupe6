@@ -1,0 +1,15 @@
+{# Messages flash : rôle « status » (succès, info) ou « alert » (erreur), annoncés par les lecteurs d'écran. #}
+{% set icones = {success: 'check-circle-fill', danger: 'x-circle-fill', warning: 'exclamation-triangle-fill', info: 'info-circle-fill'} %}
+{% set flashes = app.flashes(['success', 'danger', 'warning', 'info']) %}
+{% if flashes|filter(messages => messages is not empty) is not empty %}
+    <div class="container-xl pt-4">
+        {% for type, messages in flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type }}" role="{{ type in ['danger', 'warning'] ? 'alert' : 'status' }}">
+                    {{ icone(icones[type]) }}
+                    <div>{{ message }}</div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endif %}

@@ -23,9 +23,8 @@
     max-width: 60ch;
 }
 
-.hero .forme-deco {
-    --taille: clamp(14rem, 30vw, 26rem);
-    width: var(--taille);
+.hero .forme-deco,
+.entete-page.theme-sombre .forme-deco {
     background: var(--expernet-blanc);
     opacity: .06;
 }

@@ -69,3 +69,10 @@
     flex-wrap: wrap;
     gap: .25rem 1.5rem;
 }
+
+.pied-qualiopi {
+    max-width: 15rem;
+    padding: .5rem;
+    background: var(--expernet-blanc);
+    border-radius: var(--expernet-radius-sm);
+}

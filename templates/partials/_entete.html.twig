@@ -1,0 +1,52 @@
+{% set route = app.current_route %}
+{% set univers_courant = app.request.attributes.get('univers') %}
+{% set liens = [
+    {route: 'app_catalogue', params: {univers: 'continue'}, libelle: 'Formations continues', actif: univers_courant == 'continue'},
+    {route: 'app_catalogue', params: {univers: 'alternance'}, libelle: 'Formations en alternance', actif: univers_courant == 'alternance'},
+] %}
+
+<header class="entete theme-sombre">
+    <nav class="navbar navbar-expand-lg" aria-label="Navigation principale">
+        <div class="container-xl">
+            <a class="navbar-brand py-0 me-lg-4" href="{{ path('app_accueil') }}">
+                <img src="{{ asset('img/logo-expernet-blanc.webp') }}" width="360" height="263"
+                     alt="Expernet, Informatique & Marketing digital – retour à l’accueil">
+            </a>
+
+            <button class="navbar-toggler border-0" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#menu-principal"
+                    aria-controls="menu-principal" aria-expanded="false">
+                {{ icone('list') }}
+                <span class="visually-hidden">Menu</span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="menu-principal">
+                <ul class="navbar-nav me-auto mb-3 mb-lg-0 gap-lg-2">
+                    {% for lien in liens %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path(lien.route, lien.params) }}"{% if lien.actif %} aria-current="page"{% endif %}>
+                                {{ lien.libelle }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <form class="recherche-entete d-flex mb-3 mb-lg-0 me-lg-3" role="search"
+                      action="{{ path('app_catalogue') }}" method="get">
+                    <label for="recherche-entete" class="visually-hidden">Rechercher une formation</label>
+                    <input class="form-control" type="search" id="recherche-entete" name="q"
+                           placeholder="Rechercher une formation…" maxlength="100"
+                           value="{{ route == 'app_catalogue' ? app.request.query.get('q') : '' }}">
+                    <button class="btn btn-expernet-light" type="submit">
+                        {{ icone('search') }}
+                        <span class="visually-hidden">Lancer la recherche</span>
+                    </button>
+                </form>
+
+                <a class="btn btn-expernet-light" href="{{ path('app_login') }}">
+                    {{ icone('person-circle') }} Espace formation
+                </a>
+            </div>
+        </div>
+    </nav>
+</header>

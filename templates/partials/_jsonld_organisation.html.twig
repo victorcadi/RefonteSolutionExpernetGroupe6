@@ -1,0 +1,22 @@
+{# Données structurées Organization : uniquement des informations réelles et publiques (expernet.re). #}
+<script type="application/ld+json">
+{{ {
+    '@context': 'https://schema.org',
+    '@type': 'EducationalOrganization',
+    name: expernet.nom,
+    description: expernet.accroche,
+    url: url('app_accueil'),
+    logo: absolute_url(asset('favicon-512.png')),
+    telephone: expernet.telephone_international,
+    email: expernet.email,
+    foundingDate: expernet.depuis ~ '',
+    address: expernet_sites()|map(site => {
+        '@type': 'PostalAddress',
+        streetAddress: site.adresse,
+        postalCode: site.codePostal,
+        addressLocality: site.ville,
+        addressRegion: site.departement.value,
+        addressCountry: 'FR',
+    }),
+}|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}
+</script>
