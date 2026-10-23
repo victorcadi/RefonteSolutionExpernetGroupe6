@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use App\Enum\StatutExamen;
 use App\Enum\TypeExamen;
 use App\Repository\ExamenRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Validator\PlanificationExamen;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -13,6 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Session d'examen d'une promotion, avec son jury.
  */
 #[ORM\Entity(repositoryClass: ExamenRepository::class)]
+#[PlanificationExamen]
 class Examen
 {
     #[ORM\Id]
@@ -60,10 +63,30 @@ class Examen
     #[ORM\OneToMany(targetEntity: EvaluationCompetence::class, mappedBy: 'examen', orphanRemoval: true)]
     private Collection $evaluations;
 
+    /**
+     * Compétences évaluées lors de l'épreuve (lignes de la grille), issues du référentiel de la formation.
+     *
+     * @var Collection<int, Competence>
+     */
+    #[ORM\ManyToMany(targetEntity: Competence::class)]
+    #[ORM\JoinTable(name: 'examen_competence')]
+    #[ORM\OrderBy(['id' => 'ASC'])]
+    #[Assert\Count(min: 1, minMessage: 'Choisissez au moins une compétence à évaluer.')]
+    private Collection $competences;
+
+    /** Clôture par le jury : la grille n'est plus modifiable et les résultats sont visibles des candidats. */
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $clotureLe = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Utilisateur $cloturePar = null;
+
     public function __construct()
     {
         $this->jury = new ArrayCollection();
         $this->evaluations = new ArrayCollection();
+        $this->competences = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -191,5 +214,109 @@ class Examen
     public function getEvaluations(): Collection
     {
         return $this->evaluations;
+    }
+
+    /** Fin de l'épreuve (début + durée). */
+    public function getFin(): ?\DateTimeImmutable
+    {
+        return null === $this->dateExamen || null === $this->dureeMinutes
+            ? null
+            : $this->dateExamen->modify('+'.$this->dureeMinutes.' minutes');
+    }
+
+    /** Le jury peut évaluer dès le début de l'épreuve. */
+    public function estCommence(\DateTimeImmutable $maintenant): bool
+    {
+        return null !== $this->dateExamen && $maintenant >= $this->dateExamen;
+    }
+
+    public function getStatut(\DateTimeImmutable $maintenant): StatutExamen
+    {
+        return match (true) {
+            $this->estCloture() => StatutExamen::Cloture,
+            $this->estCommence($maintenant) => StatutExamen::EnCorrection,
+            default => StatutExamen::AVenir,
+        };
+    }
+
+    /** Une grille est entamée dès qu'un niveau a été saisi. */
+    public function aDesEvaluations(): bool
+    {
+        return !$this->evaluations->isEmpty();
+    }
+
+    /**
+     * Identifiants des compétences déjà évaluées pour au moins un candidat.
+     *
+     * @return list<int>
+     */
+    public function getCompetencesEvalueesIds(): array
+    {
+        $ids = [];
+        foreach ($this->evaluations as $evaluation) {
+            $ids[(int) $evaluation->getCompetence()?->getId()] = true;
+        }
+
+        return array_keys($ids);
+    }
+
+    public function estCloture(): bool
+    {
+        return null !== $this->clotureLe;
+    }
+
+    public function getClotureLe(): ?\DateTimeImmutable
+    {
+        return $this->clotureLe;
+    }
+
+    public function getCloturePar(): ?Utilisateur
+    {
+        return $this->cloturePar;
+    }
+
+    public function cloturer(Utilisateur $par, \DateTimeImmutable $le): static
+    {
+        $this->clotureLe = $le;
+        $this->cloturePar = $par;
+
+        return $this;
+    }
+
+    /** @return Collection<int, Competence> */
+    public function getCompetences(): Collection
+    {
+        return $this->competences;
+    }
+
+    public function ajouterCompetence(Competence $competence): static
+    {
+        if (!$this->competences->contains($competence)) {
+            $this->competences->add($competence);
+        }
+
+        return $this;
+    }
+
+    public function retirerCompetence(Competence $competence): static
+    {
+        $this->competences->removeElement($competence);
+
+        return $this;
+    }
+
+    /**
+     * Compétences évaluées regroupées par bloc, dans l'ordre du référentiel.
+     *
+     * @return array<string, list<Competence>>
+     */
+    public function getCompetencesParBloc(): array
+    {
+        $blocs = [];
+        foreach ($this->competences as $competence) {
+            $blocs[(string) $competence->getBloc()][] = $competence;
+        }
+
+        return $blocs;
     }
 }

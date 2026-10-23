@@ -143,9 +143,9 @@ class Formation implements SluggableInterface
     #[ORM\OrderBy(['dateDebut' => 'ASC'])]
     private Collection $sessions;
 
-    /** @var Collection<int, Competence> */
+    /** @var Collection<int, Competence> dans l’ordre du référentiel (ordre de saisie) */
     #[ORM\OneToMany(targetEntity: Competence::class, mappedBy: 'formation', cascade: ['persist'], orphanRemoval: true)]
-    #[ORM\OrderBy(['bloc' => 'ASC', 'id' => 'ASC'])]
+    #[ORM\OrderBy(['id' => 'ASC'])]
     private Collection $competences;
 
     public function __construct()
