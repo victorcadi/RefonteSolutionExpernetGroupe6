@@ -133,6 +133,10 @@ class EntFixtures extends Fixture implements DependentFixtureInterface
         // Le sceau inclut les identifiants : créneaux et comptes doivent être enregistrés avant.
         $manager->flush();
 
+        // Les trois derniers cours terminés : l'étudiant n°3 les manque (décrochage récent malgré un bon taux).
+        $termines = array_values(array_filter($creneaux, static fn (array $c): bool => $c[0]->getFin() < $maintenant));
+        $derniers = array_map(static fn (array $c): Creneau => $c[0], \array_slice($termines, -3));
+
         foreach ($creneaux as [$creneau, $jour, $j]) {
             if ($creneau->getFin() >= $maintenant) {
                 continue;
@@ -140,9 +144,12 @@ class EntFixtures extends Fixture implements DependentFixtureInterface
 
             // Créneaux passés : la plupart des étudiants ont signé.
             // L'étudiant n°5 est souvent absent pour illustrer l'alerte d'absentéisme ;
+            // l'étudiant n°3 a manqué les derniers cours ;
             // l'étudiante n°4 signe en saisissant son nom (alternative au tracé).
             foreach ($etudiants as $k => $etudiant) {
-                $absent = (4 === $k && 0 !== $jour % 3) || (0 === ($jour * 7 + $k * 3 + $j) % 23);
+                $absent = (4 === $k && 0 !== $jour % 3)
+                    || (2 === $k && \in_array($creneau, $derniers, true))
+                    || (0 === ($jour * 7 + $k * 3 + $j) % 23);
                 if ($absent) {
                     continue;
                 }
