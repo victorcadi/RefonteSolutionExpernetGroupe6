@@ -1,0 +1,150 @@
+/* Badges, alertes, accordéons, tableaux, fil d'Ariane et pagination. */
+
+.badge-expernet {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .35rem .75rem;
+    border-radius: var(--expernet-radius-pill);
+    background: var(--expernet-blanc);
+    color: var(--expernet-petrole);
+    font-size: .8125rem;
+    font-weight: var(--expernet-poids-fort);
+    line-height: 1.2;
+    box-shadow: inset 0 0 0 1px var(--expernet-border-strong);
+}
+
+.badge-expernet--niveau {
+    background: var(--expernet-petrole);
+    color: var(--expernet-blanc);
+    box-shadow: none;
+}
+
+.badge-expernet--cpf {
+    background: var(--expernet-jaune);
+    color: var(--expernet-petrole);
+    box-shadow: none;
+}
+
+.badge-expernet--univers {
+    background: var(--expernet-primary-dark);
+    color: var(--expernet-blanc);
+    box-shadow: none;
+}
+
+.badge-expernet--alternance {
+    background: var(--expernet-surface-rose);
+    color: var(--expernet-petrole);
+    box-shadow: inset 0 0 0 1px var(--expernet-petrole);
+}
+
+/* Alertes Bootstrap recolorées */
+.alert {
+    --bs-alert-border-radius: var(--expernet-radius-sm);
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+    border-width: 0 0 0 5px;
+}
+
+.alert .icone {
+    margin-top: .2rem;
+    font-size: 1.25rem;
+}
+
+.alert-success {
+    --bs-alert-color: var(--expernet-success);
+    --bs-alert-bg: var(--expernet-success-bg);
+    --bs-alert-border-color: var(--expernet-success);
+}
+
+.alert-danger {
+    --bs-alert-color: var(--expernet-danger);
+    --bs-alert-bg: var(--expernet-danger-bg);
+    --bs-alert-border-color: var(--expernet-danger);
+}
+
+.alert-warning {
+    --bs-alert-color: var(--expernet-warning);
+    --bs-alert-bg: var(--expernet-warning-bg);
+    --bs-alert-border-color: var(--expernet-warning);
+}
+
+.alert-info {
+    --bs-alert-color: var(--expernet-primary-darker);
+    --bs-alert-bg: var(--expernet-info-bg);
+    --bs-alert-border-color: var(--expernet-primary-dark);
+}
+
+/* Accordéons */
+.accordion {
+    --bs-accordion-border-color: var(--expernet-border);
+    --bs-accordion-border-radius: var(--expernet-radius-sm);
+    --bs-accordion-inner-border-radius: var(--expernet-radius-sm);
+    --bs-accordion-btn-focus-box-shadow: 0 0 0 6px var(--expernet-focus-halo);
+    --bs-accordion-active-color: var(--expernet-petrole);
+    --bs-accordion-active-bg: var(--expernet-surface-blue);
+}
+
+.accordion-button {
+    min-height: var(--expernet-cible-min);
+    font-weight: var(--expernet-poids-fort);
+}
+
+.accordion-button:focus-visible {
+    outline: 3px solid var(--expernet-focus);
+    outline-offset: -3px;
+}
+
+/* Tableaux : défilement horizontal maîtrisé sur mobile */
+.table-expernet {
+    --bs-table-bg: var(--expernet-surface);
+    --bs-table-striped-bg: var(--expernet-surface-muted);
+    margin-bottom: 0;
+}
+
+.table-expernet th {
+    background: var(--expernet-petrole);
+    color: var(--expernet-blanc);
+    font-weight: var(--expernet-poids-fort);
+    white-space: nowrap;
+}
+
+.table-responsive {
+    border-radius: var(--expernet-radius-sm);
+    border: 1px solid var(--expernet-border);
+}
+
+.table-responsive:focus-visible {
+    outline: 3px solid var(--expernet-focus);
+}
+
+/* Fil d'Ariane */
+.breadcrumb {
+    --bs-breadcrumb-margin-bottom: 0;
+    --bs-breadcrumb-font-size: .875rem;
+    --bs-breadcrumb-divider-color: currentColor;
+    --bs-breadcrumb-item-active-color: currentColor;
+}
+
+.theme-sombre .breadcrumb a {
+    color: var(--expernet-blanc);
+}
+
+/* Pagination */
+.pagination {
+    --bs-pagination-color: var(--expernet-primary-dark);
+    --bs-pagination-hover-color: var(--expernet-primary-darker);
+    --bs-pagination-active-bg: var(--expernet-primary-dark);
+    --bs-pagination-active-border-color: var(--expernet-primary-dark);
+    --bs-pagination-focus-box-shadow: 0 0 0 6px var(--expernet-focus-halo);
+    --bs-pagination-border-radius: var(--expernet-radius-sm);
+}
+
+.pagination .page-link {
+    min-width: var(--expernet-cible-min);
+    min-height: var(--expernet-cible-min);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

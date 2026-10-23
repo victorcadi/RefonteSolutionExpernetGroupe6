@@ -1,0 +1,224 @@
+/*
+ * Cartes Expernet.
+ * Toute la carte est cliquable grâce au lien étiré (.stretched-link) du titre :
+ * un seul lien par carte, pas de liens concurrents imbriqués.
+ */
+
+.carte {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background: var(--expernet-surface);
+    border: 1px solid var(--expernet-border);
+    border-radius: var(--expernet-radius);
+    box-shadow: var(--expernet-shadow-sm);
+    transition: box-shadow var(--expernet-transition), transform var(--expernet-transition);
+}
+
+.carte:hover {
+    box-shadow: var(--expernet-shadow);
+    transform: translateY(-2px);
+}
+
+.carte:focus-within {
+    outline: 3px solid var(--expernet-focus);
+    outline-offset: 3px;
+}
+
+/* Le focus est porté par la carte entière, pas par le lien étiré. */
+.carte .stretched-link:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+.carte-corps {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 1.25rem 1.25rem 1.5rem;
+}
+
+.carte-titre {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: var(--expernet-poids-titre);
+}
+
+.carte-titre a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.carte-titre a:hover {
+    text-decoration: underline;
+}
+
+.carte-categorie {
+    color: var(--expernet-text-muted);
+    font-size: .8125rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.carte-infos {
+    display: grid;
+    gap: .35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--expernet-texte-petit);
+}
+
+.carte-infos li {
+    display: flex;
+    gap: .5rem;
+    align-items: baseline;
+}
+
+.carte-infos .icone {
+    color: var(--expernet-primary-dark);
+}
+
+/* L'appel à l'action est décoratif : le lien est déjà porté par le titre. */
+.carte-action {
+    margin-top: auto;
+    padding-top: .75rem;
+}
+
+.carte-action .btn {
+    pointer-events: none;
+}
+
+/* Visuel : aplat coloré avec le libellé de la thématique (lisible sans image) */
+.carte-visuel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 7.5rem;
+    padding: 1.5rem 1rem;
+    background: var(--expernet-surface-blue);
+    color: var(--expernet-primary-darker);
+}
+
+.carte-visuel .icone {
+    font-size: 2.75rem;
+}
+
+.carte-visuel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carte--alternance .carte-visuel {
+    background: var(--expernet-surface-rose);
+    color: var(--expernet-petrole);
+}
+
+.carte-badge {
+    position: absolute;
+    top: .85rem;
+    left: .85rem;
+}
+
+/* Bloc de parcours (intra, inter, sur-mesure) */
+.bloc-parcours {
+    position: relative;
+    height: 100%;
+    padding: 1.5rem;
+    background: var(--expernet-surface-muted);
+    border-radius: var(--expernet-radius);
+}
+
+.bloc-parcours h3 {
+    font-size: 1.25rem;
+}
+
+.bloc-parcours .icone {
+    position: absolute;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    font-size: 2.25rem;
+    color: var(--expernet-border-strong);
+    opacity: .35;
+}
+
+/* Chiffres clés */
+.chiffre-cle {
+    margin: 0;
+}
+
+.chiffre-cle dt {
+    order: 2;
+    font-weight: 400;
+}
+
+.chiffre-cle dd {
+    order: 1;
+    margin: 0;
+    color: var(--expernet-noir);
+    font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.chiffre-cle:nth-child(even) dd {
+    color: var(--expernet-primary-dark);
+}
+
+.chiffre-cle > div {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Encart d'information (fiches, contact) */
+.encart {
+    height: 100%;
+    padding: 1.5rem;
+    background: var(--expernet-surface);
+    border-radius: var(--expernet-radius);
+    box-shadow: var(--expernet-shadow-sm);
+}
+
+.encart-sombre {
+    background: var(--expernet-petrole);
+    color: var(--expernet-blanc);
+}
+
+/* Carte de contact noire de la maquette, en bleu pétrole de la charte */
+.carte-contact {
+    height: 100%;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    background: var(--expernet-petrole);
+    color: var(--expernet-blanc);
+    border-radius: var(--expernet-radius) var(--expernet-radius) 0 0;
+}
+
+.carte-contact ul {
+    display: grid;
+    gap: 1rem;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.carte-contact li {
+    display: flex;
+    gap: .75rem;
+    align-items: baseline;
+}
+
+.carte-contact .icone {
+    color: var(--expernet-jaune);
+}
+
+@media (min-width: 992px) {
+    .carte-contact {
+        border-radius: var(--expernet-radius) 0 0 var(--expernet-radius);
+    }
+}

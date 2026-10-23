@@ -1,0 +1,144 @@
+/* Base : typographie, focus, accessibilité et sections. */
+
+html {
+    scroll-padding-top: 6rem;
+}
+
+body {
+    font-family: var(--expernet-font);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+}
+
+h1, h2, h3, h4, .h1, .h2, .h3, .h4 {
+    font-weight: var(--expernet-poids-titre);
+    line-height: 1.2;
+    text-wrap: balance;
+}
+
+h1, .h1 { font-size: var(--expernet-h1); }
+h2, .h2 { font-size: var(--expernet-h2); }
+h3, .h3 { font-size: var(--expernet-h3); }
+
+p, li {
+    text-wrap: pretty;
+}
+
+.texte-lecture {
+    max-width: var(--expernet-largeur-lecture);
+}
+
+.texte-intro {
+    font-size: 1.125rem;
+}
+
+/* Sur-titre en capitales, ex. « RASSUREZ-VOUS, ON S'OCCUPE DE TOUT » */
+.surtitre {
+    display: block;
+    margin-bottom: .5rem;
+    font-size: .875rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+/* Mot mis en valeur dans un titre (couleur d'accent, jamais seul porteur de sens) */
+.mot-cle {
+    color: var(--expernet-primary-dark);
+}
+
+.theme-sombre .mot-cle {
+    color: var(--expernet-jaune);
+}
+
+a {
+    text-underline-offset: .2em;
+}
+
+/* Focus : toujours visible, double contour lisible sur fond clair comme sombre. */
+:focus-visible {
+    outline: 3px solid var(--expernet-focus);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px var(--expernet-focus-halo);
+    border-radius: var(--expernet-radius-sm);
+}
+
+/* Lien d'évitement */
+.lien-evitement {
+    position: absolute;
+    top: .5rem;
+    left: .5rem;
+    z-index: 2000;
+    padding: .75rem 1.25rem;
+    border-radius: var(--expernet-radius-pill);
+    background: var(--expernet-jaune);
+    color: var(--expernet-petrole);
+    font-weight: var(--expernet-poids-fort);
+    text-decoration: none;
+    transform: translateY(-200%);
+}
+
+.lien-evitement:focus {
+    transform: none;
+}
+
+/* Sections alternées */
+.section {
+    position: relative;
+    padding-block: var(--expernet-section-y);
+}
+
+.section-claire { background: var(--expernet-surface-muted); }
+.section-bleue { background: var(--expernet-surface-blue); }
+.section-primaire {
+    background: var(--expernet-degrade-hero);
+}
+
+.section-titre {
+    margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+}
+
+/* Icônes SVG intégrées */
+.icone {
+    display: inline-block;
+    flex-shrink: 0;
+    vertical-align: -.125em;
+}
+
+/* Formes géométriques décoratives (hexagones arrondis de la charte) */
+.forme-deco {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    aspect-ratio: 1;
+    background: var(--expernet-shape);
+    clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+    opacity: .55;
+}
+
+.section > .container {
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 575.98px) {
+    .forme-deco { display: none; }
+}
+
+/* Bandeau de démonstration */
+.bandeau-demo {
+    background: var(--expernet-warning-bg);
+    color: var(--expernet-warning);
+    font-size: var(--expernet-texte-petit);
+}
+
+/* Mouvement réduit */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
+}

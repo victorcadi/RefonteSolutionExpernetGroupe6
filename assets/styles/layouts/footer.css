@@ -1,0 +1,71 @@
+/* Pied de page */
+
+.pied {
+    background: var(--expernet-surface-muted);
+    border-top: 4px solid var(--expernet-primary);
+    font-size: var(--expernet-texte-petit);
+}
+
+.pied h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.pied a:not(.btn) {
+    color: var(--expernet-text);
+}
+
+.pied a:not(.btn):hover {
+    color: var(--expernet-primary-darker);
+}
+
+.pied-contact {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-size: 1.25rem;
+    font-weight: var(--expernet-poids-titre);
+}
+
+.pied-contact a:not(.btn) {
+    color: var(--expernet-primary-dark);
+    text-decoration: none;
+}
+
+.pied-contact a:not(.btn):hover {
+    text-decoration: underline;
+}
+
+.pied-locaux li {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: .6rem;
+}
+
+.pied-reseaux a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--expernet-cible-min);
+    height: var(--expernet-cible-min);
+    border-radius: var(--expernet-radius-sm);
+    background: var(--expernet-primary-dark);
+    color: var(--expernet-blanc);
+    font-size: 1.25rem;
+}
+
+.pied-reseaux a:hover {
+    background: var(--expernet-primary-darker);
+    color: var(--expernet-blanc);
+}
+
+.pied-bas {
+    background: var(--expernet-blanc);
+    font-size: .875rem;
+}
+
+.pied-bas ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem 1.5rem;
+}

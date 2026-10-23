@@ -1,3 +1,27 @@
-body {
-    background-color: skyblue;
+/*
+ * Feuille d'entrée : les styles sont découpés par rôle et importés dans assets/app.js,
+ * dans l'ordre : Bootstrap → jetons → base → composants → gabarits → pages.
+ * Ce fichier réunit les petites règles utilitaires propres au site.
+ */
+
+.lien-discret {
+    color: inherit;
+    text-decoration: none;
+}
+
+.lien-discret:hover {
+    text-decoration: underline;
+}
+
+.liste-puces {
+    padding-left: 1.25rem;
+}
+
+.liste-puces li + li {
+    margin-top: .35rem;
+}
+
+.liste-sans-puce {
+    padding: 0;
+    list-style: none;
 }

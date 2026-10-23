@@ -1,0 +1,145 @@
+/*
+ * Boutons Expernet : variantes de .btn (Bootstrap) en forme de pilule.
+ * Les variables --bs-btn-* gardent la mécanique Bootstrap (états, désactivation).
+ */
+
+.btn {
+    --bs-btn-font-weight: var(--expernet-poids-fort);
+    --bs-btn-padding-x: 1.4rem;
+    --bs-btn-padding-y: .65rem;
+    --bs-btn-border-radius: var(--expernet-radius-pill);
+    --bs-btn-focus-box-shadow: 0 0 0 6px var(--expernet-focus-halo);
+    min-height: var(--expernet-cible-min);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    transition: background-color var(--expernet-transition), color var(--expernet-transition), border-color var(--expernet-transition), transform var(--expernet-transition);
+}
+
+.btn:focus-visible {
+    outline: 3px solid var(--expernet-focus);
+    outline-offset: 2px;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+/* Principal : orange, texte bleu pétrole (4,94:1), survol jaune */
+.btn-expernet-primary {
+    --bs-btn-color: var(--expernet-on-accent);
+    --bs-btn-bg: var(--expernet-accent);
+    --bs-btn-border-color: var(--expernet-accent);
+    --bs-btn-hover-color: var(--expernet-on-accent);
+    --bs-btn-hover-bg: var(--expernet-accent-hover);
+    --bs-btn-hover-border-color: var(--expernet-accent-hover);
+    --bs-btn-active-color: var(--expernet-on-accent);
+    --bs-btn-active-bg: var(--expernet-accent-hover);
+    --bs-btn-active-border-color: var(--expernet-on-accent);
+    --bs-btn-disabled-color: var(--expernet-on-accent);
+    --bs-btn-disabled-bg: var(--expernet-accent);
+    --bs-btn-disabled-border-color: var(--expernet-accent);
+}
+
+/* Secondaire : bleu foncé, texte blanc (5,4:1) */
+.btn-expernet-secondary {
+    --bs-btn-color: var(--expernet-blanc);
+    --bs-btn-bg: var(--expernet-primary-dark);
+    --bs-btn-border-color: var(--expernet-primary-dark);
+    --bs-btn-hover-color: var(--expernet-blanc);
+    --bs-btn-hover-bg: var(--expernet-primary-darker);
+    --bs-btn-hover-border-color: var(--expernet-primary-darker);
+    --bs-btn-active-color: var(--expernet-blanc);
+    --bs-btn-active-bg: var(--expernet-petrole);
+    --bs-btn-active-border-color: var(--expernet-petrole);
+    --bs-btn-disabled-color: var(--expernet-blanc);
+    --bs-btn-disabled-bg: var(--expernet-primary-dark);
+    --bs-btn-disabled-border-color: var(--expernet-primary-dark);
+}
+
+/* Clair : sur fonds colorés (en-tête, hero) */
+.btn-expernet-light {
+    --bs-btn-color: var(--expernet-petrole);
+    --bs-btn-bg: var(--expernet-blanc);
+    --bs-btn-border-color: var(--expernet-blanc);
+    --bs-btn-hover-color: var(--expernet-petrole);
+    --bs-btn-hover-bg: var(--expernet-surface-blue);
+    --bs-btn-hover-border-color: var(--expernet-surface-blue);
+    --bs-btn-active-color: var(--expernet-petrole);
+    --bs-btn-active-bg: var(--expernet-shape);
+    --bs-btn-active-border-color: var(--expernet-shape);
+    --bs-btn-disabled-color: var(--expernet-petrole);
+    --bs-btn-disabled-bg: var(--expernet-blanc);
+    --bs-btn-disabled-border-color: var(--expernet-blanc);
+}
+
+/* Contour : « En savoir + », « Lire la suite » */
+.btn-expernet-outline {
+    --bs-btn-color: var(--expernet-accent-text);
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: var(--expernet-accent);
+    --bs-btn-hover-color: var(--expernet-on-accent);
+    --bs-btn-hover-bg: var(--expernet-accent);
+    --bs-btn-hover-border-color: var(--expernet-accent);
+    --bs-btn-active-color: var(--expernet-on-accent);
+    --bs-btn-active-bg: var(--expernet-accent-hover);
+    --bs-btn-active-border-color: var(--expernet-accent-hover);
+    --bs-btn-disabled-color: var(--expernet-text-muted);
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: var(--expernet-border-strong);
+    border-width: 2px;
+}
+
+/* Filtre : pastille sélectionnable du catalogue (état actif = aria-pressed / aria-current) */
+.btn-expernet-filter {
+    --bs-btn-padding-x: 1.1rem;
+    --bs-btn-padding-y: .45rem;
+    --bs-btn-font-weight: 600;
+    --bs-btn-color: var(--expernet-petrole);
+    --bs-btn-bg: var(--expernet-blanc);
+    --bs-btn-border-color: var(--expernet-border-strong);
+    --bs-btn-hover-color: var(--expernet-petrole);
+    --bs-btn-hover-bg: var(--expernet-surface-blue);
+    --bs-btn-hover-border-color: var(--expernet-primary-dark);
+    --bs-btn-active-color: var(--expernet-on-accent);
+    --bs-btn-active-bg: var(--expernet-accent);
+    --bs-btn-active-border-color: var(--expernet-accent);
+    font-size: var(--expernet-texte-petit);
+}
+
+.btn-expernet-filter[aria-pressed="true"],
+.btn-expernet-filter[aria-current="true"],
+.btn-check:checked + .btn-expernet-filter {
+    color: var(--expernet-on-accent);
+    background: var(--expernet-accent);
+    border-color: var(--expernet-accent);
+}
+
+/* Indicateur visuel non colorimétrique de l'état sélectionné */
+.btn-expernet-filter[aria-pressed="true"]::before,
+.btn-expernet-filter[aria-current="true"]::before,
+.btn-check:checked + .btn-expernet-filter::before {
+    content: '✓';
+    font-weight: 800;
+}
+
+/* État de chargement (formulaires) */
+.btn[aria-busy="true"] {
+    pointer-events: none;
+    opacity: .85;
+}
+
+.btn[aria-busy="true"]::after {
+    content: '';
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: expernet-rotation .75s linear infinite;
+}
+
+@keyframes expernet-rotation {
+    to { transform: rotate(360deg); }
+}

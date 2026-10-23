@@ -1,0 +1,140 @@
+/*
+ * Jetons du design system Expernet.
+ *
+ * Sources des couleurs, par ordre de priorité :
+ *   1. logo officiel (cyan #009DDF, orange #ED8F00) ;
+ *   2. site expernet.re, capture de référence (bleu pétrole #0F3A4B, jaune #FFC229, gris #F7F7F7, bleu pâle #ECF7FB).
+ * Le wireframe Figma est en niveaux de gris : il ne fournit pas de couleur.
+ *
+ * Variantes d'accessibilité (WCAG 2.2 AA) :
+ *   - le blanc sur cyan officiel ne contraste qu'à 3,05:1 → textes et fonds porteurs de texte en #0071A3 (5,4:1) ;
+ *   - le blanc sur orange ne contraste qu'à 2,46:1 → texte bleu pétrole sur orange (4,94:1).
+ * Aucune couleur hexadécimale ne doit apparaître ailleurs que dans ce fichier.
+ */
+
+@font-face {
+    font-family: 'Nunito';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 200 1000;
+    src: url('../fonts/nunito-latin-wght-normal.woff2') format('woff2-variations');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Nunito';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 200 1000;
+    src: url('../fonts/nunito-latin-ext-wght-normal.woff2') format('woff2-variations');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+    /* Couleurs de marque */
+    --expernet-cyan: #009DDF;
+    --expernet-orange: #ED8F00;
+    --expernet-jaune: #FFC229;
+    --expernet-petrole: #0F3A4B;
+    --expernet-noir: #1B1B1B;
+    --expernet-blanc: #FFFFFF;
+
+    /* Rôles sémantiques */
+    --expernet-primary: var(--expernet-cyan);
+    --expernet-primary-dark: #0071A3;
+    --expernet-primary-darker: #00587F;
+    --expernet-accent: var(--expernet-orange);
+    --expernet-accent-hover: var(--expernet-jaune);
+    --expernet-on-accent: var(--expernet-petrole);
+    --expernet-accent-text: #A65800;
+
+    --expernet-surface: var(--expernet-blanc);
+    --expernet-surface-muted: #F7F7F7;
+    --expernet-surface-blue: #ECF7FB;
+    --expernet-surface-rose: #FCE4E6;
+    --expernet-surface-dark: var(--expernet-petrole);
+    --expernet-shape: #CDEAF6;
+
+    --expernet-text: var(--expernet-noir);
+    --expernet-text-muted: #5C6670;
+    --expernet-text-inverse: var(--expernet-blanc);
+    --expernet-border: #D5DCE1;
+    --expernet-border-strong: #7A8691;
+
+    --expernet-focus: var(--expernet-petrole);
+    --expernet-focus-halo: var(--expernet-jaune);
+
+    --expernet-success: #1E7B3A;
+    --expernet-success-bg: #E6F4EA;
+    --expernet-warning: #8A5A00;
+    --expernet-warning-bg: #FFF4D6;
+    --expernet-danger: #B42318;
+    --expernet-danger-bg: #FDECEA;
+    --expernet-info: var(--expernet-primary-dark);
+    --expernet-info-bg: var(--expernet-surface-blue);
+
+    --expernet-degrade-hero: linear-gradient(180deg, var(--expernet-primary-dark) 0%, var(--expernet-primary-darker) 55%, var(--expernet-petrole) 100%);
+
+    /* Typographie */
+    --expernet-font: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    --expernet-poids-titre: 800;
+    --expernet-poids-fort: 700;
+    --expernet-h1: clamp(2rem, 1.4rem + 2.6vw, 3rem);
+    --expernet-h2: clamp(1.6rem, 1.25rem + 1.5vw, 2.25rem);
+    --expernet-h3: clamp(1.25rem, 1.1rem + .6vw, 1.5rem);
+    --expernet-texte: 1.0625rem;
+    --expernet-texte-petit: .9375rem;
+    --expernet-interligne: 1.6;
+    --expernet-largeur-lecture: 68ch;
+
+    /* Formes et espacements */
+    --expernet-radius-sm: .5rem;
+    --expernet-radius: 1rem;
+    --expernet-radius-lg: 1.5rem;
+    --expernet-radius-pill: 50rem;
+    --expernet-shadow-sm: 0 2px 6px rgb(15 58 75 / .08);
+    --expernet-shadow: 0 10px 30px rgb(15 58 75 / .12);
+    --expernet-section-y: clamp(3rem, 2rem + 4vw, 5.5rem);
+    --expernet-cible-min: 44px;
+    --expernet-transition: .2s ease;
+
+    /* Raccordement de Bootstrap aux jetons Expernet */
+    --bs-body-font-family: var(--expernet-font);
+    --bs-body-font-size: var(--expernet-texte);
+    --bs-body-line-height: var(--expernet-interligne);
+    --bs-body-color: var(--expernet-text);
+    --bs-body-color-rgb: 27, 27, 27;
+    --bs-body-bg: var(--expernet-surface);
+    --bs-emphasis-color: var(--expernet-noir);
+    --bs-secondary-color: var(--expernet-text-muted);
+    --bs-heading-color: inherit;
+    --bs-primary: var(--expernet-primary-dark);
+    --bs-primary-rgb: 0, 113, 163;
+    --bs-link-color: var(--expernet-primary-dark);
+    --bs-link-color-rgb: 0, 113, 163;
+    --bs-link-hover-color: var(--expernet-primary-darker);
+    --bs-link-hover-color-rgb: 0, 88, 127;
+    --bs-border-color: var(--expernet-border);
+    --bs-border-radius: var(--expernet-radius-sm);
+    --bs-border-radius-lg: var(--expernet-radius);
+    --bs-border-radius-xl: var(--expernet-radius-lg);
+    --bs-border-radius-pill: var(--expernet-radius-pill);
+    --bs-focus-ring-color: rgb(15 58 75 / .35);
+    --bs-success: var(--expernet-success);
+    --bs-danger: var(--expernet-danger);
+    --bs-form-invalid-color: var(--expernet-danger);
+    --bs-form-invalid-border-color: var(--expernet-danger);
+    --bs-form-valid-color: var(--expernet-success);
+    --bs-form-valid-border-color: var(--expernet-success);
+}
+
+/* Sur fond sombre, le contour de focus passe en jaune pour rester visible. */
+.theme-sombre {
+    --expernet-focus: var(--expernet-jaune);
+    --expernet-focus-halo: var(--expernet-petrole);
+    --bs-link-color: var(--expernet-blanc);
+    --bs-link-color-rgb: 255, 255, 255;
+    --bs-link-hover-color: var(--expernet-jaune);
+    --bs-link-hover-color-rgb: 255, 194, 41;
+    color: var(--expernet-text-inverse);
+}

@@ -1,0 +1,107 @@
+/* En-tête et navigation principale */
+
+.entete {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: var(--expernet-primary-dark);
+    box-shadow: var(--expernet-shadow-sm);
+}
+
+.entete .navbar {
+    --bs-navbar-padding-y: .5rem;
+    --bs-navbar-color: var(--expernet-blanc);
+    --bs-navbar-hover-color: var(--expernet-jaune);
+    --bs-navbar-active-color: var(--expernet-jaune);
+    --bs-navbar-brand-color: var(--expernet-blanc);
+    --bs-navbar-toggler-border-color: rgb(255 255 255 / .6);
+    --bs-navbar-toggler-focus-width: 0;
+    --bs-nav-link-font-weight: var(--expernet-poids-fort);
+    --bs-nav-link-padding-y: .75rem;
+}
+
+.entete .navbar-brand img {
+    width: auto;
+    height: 3.5rem;
+}
+
+@media (min-width: 992px) {
+    .entete .navbar-brand img { height: 4.25rem; }
+}
+
+.entete .nav-link {
+    display: flex;
+    align-items: center;
+    min-height: var(--expernet-cible-min);
+    font-size: 1.0625rem;
+}
+
+/* Page courante : soulignement en plus de la couleur */
+.entete .nav-link[aria-current="page"] {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: .45em;
+}
+
+.entete .navbar-toggler {
+    min-width: var(--expernet-cible-min);
+    min-height: var(--expernet-cible-min);
+    color: var(--expernet-blanc);
+    font-size: 1.75rem;
+}
+
+/* Recherche dans l'en-tête */
+.recherche-entete .form-control {
+    min-height: var(--expernet-cible-min);
+    border: 0;
+    border-radius: var(--expernet-radius-pill) 0 0 var(--expernet-radius-pill);
+    padding-inline: 1.1rem;
+}
+
+.recherche-entete .btn {
+    border-radius: 0 var(--expernet-radius-pill) var(--expernet-radius-pill) 0;
+    min-width: var(--expernet-cible-min);
+}
+
+@media (min-width: 1200px) {
+    .recherche-entete { width: 17rem; }
+}
+
+/* Menu mobile : panneau déroulant lisible */
+@media (max-width: 991.98px) {
+    .entete .navbar-collapse {
+        margin-top: .75rem;
+        padding-block: .5rem 1rem;
+        border-top: 1px solid rgb(255 255 255 / .25);
+    }
+
+    .entete .nav-link {
+        padding-inline: .25rem;
+        border-bottom: 1px solid rgb(255 255 255 / .12);
+    }
+}
+
+/* Sous-navigation de l'ENT (rose clair de la maquette) */
+.ent-nav {
+    background: var(--expernet-surface-rose);
+    border-bottom: 1px solid var(--expernet-border);
+}
+
+.ent-nav .nav-link {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    min-height: 3.5rem;
+    color: var(--expernet-noir);
+    font-weight: var(--expernet-poids-fort);
+    font-size: 1.0625rem;
+}
+
+.ent-nav .nav-link:hover {
+    color: var(--expernet-primary-darker);
+}
+
+.ent-nav .nav-link[aria-current="page"] {
+    color: var(--expernet-primary-darker);
+    box-shadow: inset 0 -4px 0 var(--expernet-primary-dark);
+}

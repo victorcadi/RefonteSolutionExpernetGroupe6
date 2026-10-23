@@ -1,10 +1,17 @@
 import './stimulus_bootstrap.js';
-/*
- * Welcome to your app's main JavaScript file!
- *
- * This file will be included onto the page via the importmap() Twig function,
- * which should already be in your base.html.twig.
- */
-import './styles/app.css';
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+// Composants interactifs de Bootstrap (menu mobile, accordéons…).
+import 'bootstrap';
+
+// Styles : Bootstrap, puis le design system Expernet.
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './styles/tokens.css';
+import './styles/base.css';
+import './styles/components/buttons.css';
+import './styles/components/cards.css';
+import './styles/components/forms.css';
+import './styles/components/feedback.css';
+import './styles/components/hero.css';
+import './styles/layouts/header.css';
+import './styles/layouts/footer.css';
+import './styles/app.css';

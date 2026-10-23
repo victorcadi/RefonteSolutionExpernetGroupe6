@@ -1,0 +1,93 @@
+/* Champs de formulaire : bordure contrastée (3,7:1), focus visible, erreurs explicites. */
+
+.form-control,
+.form-select {
+    min-height: var(--expernet-cible-min);
+    border-color: var(--expernet-border-strong);
+    border-radius: var(--expernet-radius-sm);
+    font-size: 1rem;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: var(--expernet-petrole);
+    outline: 3px solid var(--expernet-focus);
+    outline-offset: 1px;
+    box-shadow: 0 0 0 6px var(--expernet-focus-halo);
+}
+
+.form-label,
+.col-form-label,
+legend.col-form-label {
+    font-weight: var(--expernet-poids-fort);
+}
+
+.form-check-input {
+    width: 1.25em;
+    height: 1.25em;
+    border-color: var(--expernet-border-strong);
+}
+
+.form-check-input:checked {
+    background-color: var(--expernet-primary-dark);
+    border-color: var(--expernet-primary-dark);
+}
+
+.form-check {
+    min-height: 1.75rem;
+}
+
+.form-text {
+    color: var(--expernet-text-muted);
+}
+
+/* Erreurs : icône + texte, jamais la couleur seule */
+.invalid-feedback,
+.form-error-message {
+    color: var(--expernet-danger);
+    font-weight: 600;
+}
+
+.invalid-feedback::before {
+    content: '⚠ ';
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-width: 2px;
+    background-image: none;
+}
+
+.champ-obligatoire {
+    color: var(--expernet-danger);
+    text-decoration: none;
+}
+
+/* Piège à robots : masqué pour tous, y compris les lecteurs d'écran */
+.champ-piege {
+    position: absolute !important;
+    left: -10000px !important;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Panneau de formulaire de la maquette (fond gris clair) */
+.panneau-formulaire {
+    height: 100%;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    background: var(--expernet-surface-muted);
+    border-radius: 0 0 var(--expernet-radius) var(--expernet-radius);
+}
+
+@media (min-width: 992px) {
+    .panneau-formulaire {
+        border-radius: 0 var(--expernet-radius) var(--expernet-radius) 0;
+    }
+}
+
+.form-mentions {
+    font-size: .875rem;
+    color: var(--expernet-text-muted);
+}
