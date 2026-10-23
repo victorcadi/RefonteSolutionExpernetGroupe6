@@ -31,4 +31,27 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
         $user->setPassword($newHashedPassword);
         $this->getEntityManager()->flush();
     }
+
+    /**
+     * Nombre de comptes actifs par rôle.
+     *
+     * @return array<string, int> valeur du rôle => nombre
+     */
+    public function compterActifsParRole(): array
+    {
+        $lignes = $this->createQueryBuilder('u')
+            ->select('u.role AS role, COUNT(u.id) AS total')
+            ->andWhere('u.actif = true')
+            ->groupBy('u.role')
+            ->getQuery()
+            ->getArrayResult();
+
+        $comptes = [];
+        foreach ($lignes as $ligne) {
+            $role = $ligne['role'] instanceof \BackedEnum ? $ligne['role']->value : (string) $ligne['role'];
+            $comptes[$role] = (int) $ligne['total'];
+        }
+
+        return $comptes;
+    }
 }
