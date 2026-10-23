@@ -1,0 +1,35 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% block title %}Mes jurys{% endblock %}
+
+{% block contenu %}
+    <h1>Mes jurys</h1>
+    <p class="texte-intro texte-lecture">
+        Les examens dans lesquels vous siégez. La saisie des grilles s’ouvre au début de l’épreuve
+        et se termine quand un membre du jury clôture l’examen.
+    </p>
+
+    {% if examens is empty %}
+        <div class="alert alert-info" role="status">
+            {{ icone('info-circle-fill') }}
+            <div>Vous ne siégez dans aucun jury.</div>
+        </div>
+    {% else %}
+        <ul class="liste-sans-puce liste-creneaux encart h-auto">
+            {% for examen in examens %}
+                <li class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <div>
+                        <p class="mb-0 fw-bold">{{ examen.intitule }} {{ include('ent/examen/_statut.html.twig') }}</p>
+                        <p class="mb-0 small">
+                            {{ examen.promotion.nom }} ·
+                            <time datetime="{{ examen.dateExamen|date('c') }}">{{ examen.dateExamen|format_datetime('long', 'short', locale: 'fr') }}</time>
+                        </p>
+                    </div>
+                    <a class="btn btn-expernet-secondary btn-sm" href="{{ path('app_ent_jury_examen', {id: examen.id}) }}">
+                        {{ icone('clipboard-check') }} Grilles<span class="visually-hidden"> de l’examen {{ examen.intitule }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% set titre = examen ? 'Modifier l’examen' : 'Planifier un examen' %}
+{% block title %}{{ form.vars.submitted ? 'Erreur – ' : '' }}{{ titre }}{% endblock %}
+
+{% block contenu %}
+    <p class="small mb-2"><a href="{{ path('app_ent_admin_examens') }}">{{ icone('arrow-left') }} Retour aux examens</a></p>
+    <h1>{{ titre }}</h1>
+
+    <div class="row g-4 g-lg-5">
+        <div class="col-lg-8">
+            {{ include('demande/_erreurs.html.twig') }}
+
+            {{ form_start(form, {attr: {'aria-label': titre}}) }}
+                <fieldset class="mb-4">
+                    <legend class="h4">Épreuve</legend>
+                    {{ form_row(form.intitule) }}
+                    {{ form_row(form.type) }}
+                    {{ form_row(form.promotion) }}
+                </fieldset>
+
+                <fieldset class="mb-4">
+                    <legend class="h4">Date et lieu</legend>
+                    <div class="row g-3">
+                        <div class="col-md-7">{{ form_row(form.dateExamen) }}</div>
+                        <div class="col-md-5">{{ form_row(form.dureeMinutes) }}</div>
+                        <div class="col-md-7">{{ form_row(form.site) }}</div>
+                        <div class="col-md-5">{{ form_row(form.salle) }}</div>
+                    </div>
+                </fieldset>
+
+                <div class="encart h-auto mb-4">
+                    {{ form_row(form.jury) }}
+                    <p class="small mb-0">Seuls les comptes actifs habilités à siéger dans un jury sont proposés. Un juré ne peut pas siéger dans deux examens au même moment.</p>
+                </div>
+
+                <div class="encart h-auto mb-4">
+                    {{ form_row(form.competences) }}
+                </div>
+
+                <button type="submit" class="btn btn-expernet-primary">{{ icone('check-circle-fill') }} {{ examen ? 'Enregistrer les modifications' : 'Planifier l’examen' }}</button>
+            {{ form_end(form) }}
+        </div>
+
+        <aside class="col-lg-4" aria-labelledby="titre-aide-examen">
+            <div class="encart section-claire h-auto">
+                <h2 id="titre-aide-examen" class="h5 fw-bold">Règles de planification</h2>
+                <ul class="mb-0">
+                    <li>Le jury compte au moins deux membres, sans étudiant.</li>
+                    <li>Une promotion ne passe pas deux épreuves en même temps.</li>
+                    <li>La grille ne contient que des compétences du référentiel de la formation de la promotion.</li>
+                    <li>Une fois les grilles entamées, la promotion, l’horaire et les compétences déjà évaluées ne sont plus modifiables.</li>
+                    <li>Un examen clôturé par le jury n’est plus modifiable.</li>
+                </ul>
+            </div>
+
+            {% if suppression is defined %}
+                <div class="encart h-auto mt-4">
+                    <h2 class="h5 fw-bold">Supprimer l’examen</h2>
+                    {% if examen.aDesEvaluations %}
+                        <p class="mb-0">Le jury a commencé à remplir les grilles : l’examen ne peut plus être supprimé.</p>
+                    {% else %}
+                        <p>La suppression est définitive.</p>
+                        {{ form_start(suppression) }}
+                            <button type="submit" class="btn btn-expernet-secondary btn-sm">{{ icone('x-circle-fill') }} Supprimer l’examen</button>
+                        {{ form_end(suppression) }}
+                    {% endif %}
+                </div>
+            {% endif %}
+        </aside>
+    </div>
+{% endblock %}

@@ -98,6 +98,7 @@
             <section class="col-lg-6" aria-labelledby="titre-examens">
                 <div class="encart">
                     <h2 id="titre-examens" class="h4">Examens à venir</h2>
+                    <p class="small"><a href="{{ path('app_ent_etudiant_examens') }}">{{ icone('award-fill') }} Mes examens et résultats</a></p>
                     {% if examens is empty %}
                         <p class="mb-0">Aucun examen programmé.</p>
                     {% else %}

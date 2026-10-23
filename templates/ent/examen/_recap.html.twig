@@ -1,0 +1,33 @@
+{# Récapitulatif d'un examen : épreuve, date, durée, lieu, promotion (et jury si demandé). #}
+<dl class="recap-creneau mb-0">
+    <div>
+        <dt>Épreuve</dt>
+        <dd>{{ examen.type.libelle }}</dd>
+    </div>
+    <div>
+        <dt>Date</dt>
+        <dd><time datetime="{{ examen.dateExamen|date('Y-m-d') }}">{{ examen.dateExamen|format_date('full', locale: 'fr')|capitalize }}</time></dd>
+    </div>
+    <div>
+        <dt>Horaires</dt>
+        <dd>
+            <time datetime="{{ examen.dateExamen|date('c') }}">{{ examen.dateExamen|date('H:i') }}</time>
+            – <time datetime="{{ examen.fin|date('c') }}">{{ examen.fin|date('H:i') }}</time>
+            ({{ examen.dureeMinutes }} min)
+        </dd>
+    </div>
+    <div>
+        <dt>Lieu</dt>
+        <dd>{{ examen.site ? examen.site.nom : 'Non renseigné' }}{{ examen.salle ? ', ' ~ examen.salle : '' }}</dd>
+    </div>
+    <div>
+        <dt>Promotion</dt>
+        <dd>{{ examen.promotion.nom }}</dd>
+    </div>
+    {% if avec_jury ?? false %}
+        <div>
+            <dt>Jury</dt>
+            <dd>{{ examen.jury|map(m => m.nomComplet)|join(', ') }}</dd>
+        </div>
+    {% endif %}
+</dl>

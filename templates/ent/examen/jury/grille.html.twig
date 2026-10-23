@@ -1,0 +1,89 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% set examen = grille.examen %}
+{% block title %}{{ form and form.vars.submitted ? 'Erreur – ' : '' }}Grille de {{ candidat.nomComplet }}{% endblock %}
+
+{% block contenu %}
+    <p class="small mb-2"><a href="{{ path('app_ent_jury_examen', {id: examen.id}) }}">{{ icone('arrow-left') }} Retour à l’examen</a></p>
+    <h1>Grille de {{ candidat.nomComplet }}</h1>
+    <p class="texte-intro texte-lecture">
+        {{ examen.intitule }} ·
+        <time datetime="{{ examen.dateExamen|date('c') }}">{{ examen.dateExamen|format_datetime('long', 'short', locale: 'fr') }}</time>
+    </p>
+
+    {% if form %}
+        <div class="row g-4 g-lg-5">
+            <div class="col-lg-8">
+                {{ include('demande/_erreurs.html.twig') }}
+
+                {{ form_start(form, {attr: {'aria-label': 'Grille de compétences de ' ~ candidat.nomComplet}}) }}
+                    {% for bloc, competences in examen.competencesParBloc %}
+                        <section class="encart h-auto mb-4" aria-labelledby="bloc-{{ loop.index }}">
+                            <h2 id="bloc-{{ loop.index }}" class="h4">{{ bloc }}</h2>
+                            {% for competence in competences %}
+                                <div class="{{ not loop.last ? 'border-bottom pb-3 mb-3' : '' }}">
+                                    {{ form_row(form['niveau_' ~ competence.id]) }}
+                                    {{ form_row(form['commentaire_' ~ competence.id]) }}
+                                </div>
+                            {% endfor %}
+                        </section>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-expernet-primary">{{ icone('check-circle-fill') }} Enregistrer la grille</button>
+                {{ form_end(form) }}
+            </div>
+
+            <aside class="col-lg-4" aria-labelledby="titre-aide-grille">
+                <div class="encart section-claire h-auto">
+                    <h2 id="titre-aide-grille" class="h5 fw-bold">Remplir la grille</h2>
+                    <ul class="mb-0">
+                        <li>Vous pouvez enregistrer la grille en plusieurs fois : une compétence sans niveau reste à évaluer.</li>
+                        <li>Le commentaire est facultatif et sera visible du candidat après la clôture.</li>
+                        <li>Chaque niveau garde le nom du juré qui l’a saisi et l’heure de saisie.</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    {% else %}
+        {% if examen.estCloture %}
+            <div class="alert alert-info" role="status">
+                {{ icone('info-circle-fill') }}
+                <div>L’examen est clôturé : la grille n’est plus modifiable.</div>
+            </div>
+        {% endif %}
+
+        {% for bloc, competences in examen.competencesParBloc %}
+            <div class="table-responsive mb-4" tabindex="0" role="region" aria-labelledby="legende-bloc-{{ loop.index }}">
+                <table class="table table-striped table-expernet align-top">
+                    <caption id="legende-bloc-{{ loop.index }}">{{ bloc }}</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Compétence</th>
+                            <th scope="col">Niveau</th>
+                            <th scope="col">Commentaire</th>
+                            <th scope="col">Saisi par</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for competence in competences %}
+                            {% set evaluation = grille.evaluation(candidat, competence.id) %}
+                            <tr>
+                                <th scope="row" class="fw-normal">{{ competence.libelle }}</th>
+                                <td>{{ evaluation ? evaluation.niveau.libelle : 'Non évaluée' }}</td>
+                                <td>{{ evaluation and evaluation.commentaire ? evaluation.commentaire : '–' }}</td>
+                                <td>
+                                    {% if evaluation %}
+                                        {{ evaluation.evaluateur ? evaluation.evaluateur.nomComplet : 'Compte supprimé' }},
+                                        <time datetime="{{ evaluation.saisieLe|date('c') }}">{{ evaluation.saisieLe|date('d/m/Y à H:i') }}</time>
+                                    {% else %}
+                                        –
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

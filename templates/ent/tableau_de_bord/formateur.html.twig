@@ -58,13 +58,14 @@
         <section class="col-12" aria-labelledby="titre-jurys">
             <div class="encart">
                 <h2 id="titre-jurys" class="h4">Jurys d’examen</h2>
+                <p class="small"><a href="{{ path('app_ent_jury_examens') }}">{{ icone('award-fill') }} Voir tous mes jurys et les grilles</a></p>
                 {% if jurys is empty %}
                     <p class="mb-0">Vous ne siégez dans aucun jury à venir.</p>
                 {% else %}
                     <ul class="liste-sans-puce liste-creneaux mb-0">
                         {% for examen in jurys %}
                             <li>
-                                <p class="mb-0 fw-bold">{{ examen.intitule }}</p>
+                                <p class="mb-0 fw-bold"><a href="{{ path('app_ent_jury_examen', {id: examen.id}) }}">{{ examen.intitule }}</a></p>
                                 <p class="mb-0 small">
                                     {{ examen.promotion.nom }} ·
                                     <time datetime="{{ examen.dateExamen|date('c') }}">{{ examen.dateExamen|format_datetime('long', 'short', locale: 'fr') }}</time>
