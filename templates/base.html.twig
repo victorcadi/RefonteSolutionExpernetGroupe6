@@ -6,7 +6,8 @@
         {% set titre_page = block('title') is defined and block('title')|trim is not empty ? block('title')|trim : null %}
         <title>{{ titre_page ? titre_page ~ ' | ' : '' }}Expernet – Formation Informatique & Marketing Digital</title>
         <meta name="description" content="{% block meta_description %}{{ expernet.accroche }}. Formations continues, formations en alternance et certifications professionnelles.{% endblock %}">
-        {% block robots %}{% endblock %}
+        {# Site de démonstration : contenus fictifs, jamais indexés. #}
+        {% if expernet_demo %}<meta name="robots" content="noindex, nofollow">{% else %}{% block robots %}{% endblock %}{% endif %}
         <link rel="canonical" href="{% block canonical %}{{ url(app.current_route ?? 'app_accueil', app.current_route_parameters ?? {}) }}{% endblock %}">
 
         <meta property="og:type" content="{% block og_type %}website{% endblock %}">

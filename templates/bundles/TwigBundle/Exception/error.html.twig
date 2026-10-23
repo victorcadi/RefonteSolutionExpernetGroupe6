@@ -1,0 +1,60 @@
+{#
+    Page d'erreur publique (production). Le code HTTP est fourni par Symfony : status_code.
+    Aucun détail technique n'est affiché.
+#}
+{% extends 'base.html.twig' %}
+
+{% set introuvable = status_code == 404 %}
+{% set interdit = status_code == 403 %}
+
+{% block title %}{{ introuvable ? 'Page introuvable' : (interdit ? 'Accès refusé' : 'Erreur') }} ({{ status_code }}){% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block canonical %}{{ url('app_accueil') }}{% endblock %}
+{% block donnees_structurees %}{% endblock %}
+
+{% block body %}
+    <section class="section" aria-labelledby="titre-erreur">
+        <div class="forme-deco forme-deco--droite" aria-hidden="true"></div>
+        <div class="container-xl">
+            <div class="row">
+                <div class="col-lg-8">
+                    <p class="surtitre">Erreur {{ status_code }}</p>
+                    <h1 id="titre-erreur">
+                        {%- if introuvable -%}
+                            Cette page est introuvable
+                        {%- elseif interdit -%}
+                            Vous n’avez pas accès à cette page
+                        {%- else -%}
+                            Une erreur est survenue
+                        {%- endif -%}
+                    </h1>
+                    <p class="texte-intro texte-lecture">
+                        {% if introuvable %}
+                            L’adresse est peut-être mal saisie, ou la page a été déplacée ou supprimée.
+                            Si vous recherchez une formation, utilisez la recherche ou parcourez le catalogue.
+                        {% elseif interdit %}
+                            Cette page est réservée à certains utilisateurs. Connectez-vous avec un compte autorisé ou revenez à l’accueil.
+                        {% else %}
+                            Le service est momentanément indisponible. Réessayez dans quelques instants ;
+                            si le problème persiste, contactez-nous.
+                        {% endif %}
+                    </p>
+
+                    {% if introuvable %}
+                        <form class="recherche-erreur d-flex gap-2 my-4" role="search" action="{{ path('app_catalogue') }}" method="get">
+                            <label for="recherche-erreur" class="visually-hidden">Rechercher une formation</label>
+                            <input class="form-control" type="search" id="recherche-erreur" name="q" maxlength="100" placeholder="Rechercher une formation…">
+                            <button class="btn btn-expernet-primary" type="submit">{{ icone('search') }} Rechercher</button>
+                        </form>
+                    {% endif %}
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-expernet-secondary" href="{{ path('app_accueil') }}">{{ icone('house-door-fill') }} Retour à l’accueil</a>
+                        <a class="btn btn-expernet-outline" href="{{ path('app_catalogue') }}">Voir le catalogue</a>
+                        <a class="btn btn-expernet-outline" href="{{ path('app_contact') }}">Nous contacter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
