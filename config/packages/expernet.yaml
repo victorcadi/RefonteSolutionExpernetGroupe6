@@ -18,8 +18,8 @@ parameters:
         email: 'formation@expernet.re'
         certification_qualiopi: 'La certification qualité a été délivrée au titre de la catégorie d’actions suivantes : actions de formation, actions de formation par apprentissage.'
         # Documents officiels : déposer le PDF dans public/documents/ puis renseigner son nom.
-        certificat_qualiopi_pdf: null
-        livret_accueil_pdf: null
+        certificat_qualiopi_pdf: 'certificat-qualiopi.pdf'
+        livret_accueil_pdf: 'livret-accueil-formation-continue.pdf'
         referente_handicap:
             nom: 'Murielle CHAMAND'
             telephone: '02 62 21 90 45'
@@ -29,10 +29,28 @@ parameters:
         conservation_donnees:
             demandes: '3 ans à compter de notre dernier échange'
             candidatures: '2 ans après notre dernier échange, sans suite de votre part'
+            espace_formation: 'pendant la formation, puis le temps nécessaire aux contrôles des financeurs et des certificateurs'
         reseaux_sociaux:
-            # URL officielles à renseigner (null = icône masquée).
-            facebook: null
-            linkedin: null
+            # Comptes officiels liés depuis le pied de page d'expernet.re (null = icône masquée).
+            facebook: 'https://www.facebook.com/EXPERNETFORMATION'
+            linkedin: 'https://www.linkedin.com/in/expernet-centre-de-formation/'
+        # Mentions légales. Sources : page « Mentions légales » d'expernet.re et certificat
+        # Qualiopi n° 23FOR01923.1 (octobre 2026). Une valeur à null n'est pas affichée.
+        mentions_legales:
+            raison_sociale: 'EXPERNET'
+            forme_juridique: null
+            capital: null
+            siege: '38, rue Claude Chappe, ZAC 2000, 97420 Le Port'
+            siren: '442 764 684'
+            siret: '442 764 684 00027'
+            rcs: null
+            tva_intracommunautaire: null
+            declaration_activite: '98 97 01198 97'
+            declaration_activite_note: 'Cet enregistrement ne vaut pas agrément de l’État.'
+            certificat_qualiopi: { numero: '23FOR01923.1', organisme: 'QUALITIA Certification', valide_jusqu_au: '2027-06-22' }
+            responsable_publication: null
+            # Hébergeur du site actuel : à mettre à jour lors du déploiement de la refonte.
+            hebergeur: { nom: 'Hodi', adresse: '14 rue Pasteur, 97400 Saint-Denis, La Réunion' }
 
     # Chiffres clés affichés sur la page d'accueil (expernet.re).
     expernet.chiffres_cles:
