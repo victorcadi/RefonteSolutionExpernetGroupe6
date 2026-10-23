@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Creneau;
 use App\Entity\Emargement;
 use App\Entity\Utilisateur;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -60,5 +61,47 @@ class EmargementRepository extends ServiceEntityRepository
             ->getSingleColumnResult();
 
         return array_fill_keys(array_map('intval', $signes), true);
+    }
+
+    /**
+     * Émargements d'un créneau, indexés par identifiant d'étudiant.
+     *
+     * @return array<int, Emargement>
+     */
+    public function findPourCreneauParEtudiant(Creneau $creneau): array
+    {
+        $parEtudiant = [];
+        foreach ($this->findBy(['creneau' => $creneau]) as $emargement) {
+            $parEtudiant[(int) $emargement->getEtudiant()?->getId()] = $emargement;
+        }
+
+        return $parEtudiant;
+    }
+
+    /**
+     * Émargements d'un étudiant sur les créneaux commençant entre deux instants, indexés par créneau.
+     *
+     * @return array<int, Emargement>
+     */
+    public function findPourEtudiantEntre(Utilisateur $etudiant, \DateTimeImmutable $debut, \DateTimeImmutable $fin): array
+    {
+        $resultats = $this->createQueryBuilder('e')
+            ->addSelect('c')
+            ->join('e.creneau', 'c')
+            ->andWhere('e.etudiant = :etudiant')
+            ->andWhere('c.debut >= :debut')
+            ->andWhere('c.debut < :fin')
+            ->setParameter('etudiant', $etudiant)
+            ->setParameter('debut', $debut)
+            ->setParameter('fin', $fin)
+            ->getQuery()
+            ->getResult();
+
+        $parCreneau = [];
+        foreach ($resultats as $emargement) {
+            $parCreneau[(int) $emargement->getCreneau()?->getId()] = $emargement;
+        }
+
+        return $parCreneau;
     }
 }

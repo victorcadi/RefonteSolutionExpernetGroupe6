@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Feuille d’émargement – {{ creneau.intitule }} – {{ creneau.debut|date('d/m/Y') }}</title>
+    {# Styles internes : dompdf n'accède pas aux feuilles de style du site. #}
+    <style>
+        @page { margin: 18mm 16mm 22mm; }
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 10pt; color: #1B1B1B; line-height: 1.4; }
+        h1 { font-size: 17pt; color: #0071A3; margin: 0 0 3mm; }
+        .entete { border-bottom: 3pt solid #ED8F00; padding-bottom: 3mm; margin-bottom: 5mm; }
+        .organisme { font-size: 8.5pt; color: #5C6670; }
+        .infos td { padding: .8mm 2mm .8mm 0; border: 0; }
+        .infos td.libelle { width: 28mm; font-weight: bold; color: #0F3A4B; }
+        table.feuille { width: 100%; border-collapse: collapse; margin-top: 5mm; }
+        .feuille th { background: #0F3A4B; color: #FFFFFF; text-align: left; padding: 2mm; font-size: 9pt; }
+        .feuille td { padding: 1.5mm 2mm; border-bottom: .5pt solid #D5DCE1; vertical-align: middle; height: 13mm; }
+        .feuille img { width: 38mm; height: 12.5mm; }
+        .absent { color: #A4262C; font-weight: bold; }
+        .altere { color: #A4262C; font-weight: bold; }
+        .bilan { margin-top: 4mm; font-weight: bold; }
+        .demo { background: #FFF4D6; color: #8A5A00; padding: 2mm 3mm; margin-bottom: 4mm; font-size: 9pt; }
+        .note { font-size: 8pt; color: #5C6670; margin-top: 5mm; }
+        .pied { position: fixed; bottom: -14mm; left: 0; right: 0; font-size: 7.5pt; color: #5C6670; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="pied">
+        {{ expernet.mentions_legales.raison_sociale }} – {{ expernet.mentions_legales.siege }}
+        – N° de déclaration d’activité {{ expernet.mentions_legales.declaration_activite }}
+        – Document généré le {{ genere_le|date('d/m/Y à H:i') }}
+    </div>
+
+    <div class="entete">
+        <div class="organisme">{{ expernet.mentions_legales.raison_sociale }} – {{ expernet.accroche }}</div>
+        <h1>Feuille d’émargement</h1>
+        <table class="infos">
+            <tr><td class="libelle">Formation</td><td>{{ creneau.promotion.formation ? creneau.promotion.formation.intitule : '' }} – {{ creneau.promotion.nom }}</td></tr>
+            <tr><td class="libelle">Cours</td><td>{{ creneau.intitule }}</td></tr>
+            <tr><td class="libelle">Date</td><td>{{ creneau.debut|format_date('full', locale: 'fr')|capitalize }}, de {{ creneau.debut|date('H:i') }} à {{ creneau.fin|date('H:i') }}</td></tr>
+            <tr><td class="libelle">Formateur</td><td>{{ creneau.formateur ? creneau.formateur.nomComplet : 'Non renseigné' }}{{ creneau.salle ? ' – ' ~ creneau.salle : '' }}</td></tr>
+        </table>
+    </div>
+
+    {% if expernet_demo %}
+        <div class="demo">Document de démonstration : les personnes et les cours sont fictifs.</div>
+    {% endif %}
+
+    <table class="feuille">
+        <thead>
+            <tr><th>Étudiant</th><th>Présence</th><th>Signé à</th><th>Signature</th><th>Sceau</th></tr>
+        </thead>
+        <tbody>
+            {% for ligne in lignes %}
+                {% set emargement = ligne.emargement %}
+                <tr>
+                    <td>{{ ligne.etudiant.nom|upper }} {{ ligne.etudiant.prenom }}</td>
+                    <td>
+                        {% if emargement %}Présent(e){% elseif termine %}<span class="absent">Absent(e)</span>{% else %}En attente{% endif %}
+                    </td>
+                    <td>{{ emargement ? emargement.signeLe|date('H:i') : '–' }}</td>
+                    <td>
+                        {% if emargement is null %}–
+                        {% elseif emargement.mode.value == 'manuscrite' %}<img src="{{ emargement.signature }}" alt="Signature de {{ ligne.etudiant.nomComplet }}">
+                        {% else %}{{ emargement.mode.libelle }} : « {{ emargement.signature }} »{% endif %}
+                    </td>
+                    <td>
+                        {% if emargement is null %}–{% elseif ligne.integre %}Vérifié{% else %}<span class="altere">Modifié</span>{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p class="bilan">{{ presents }} présent{{ presents > 1 ? 's' : '' }} sur {{ lignes|length }} étudiant{{ lignes|length > 1 ? 's' : '' }}.</p>
+
+    <p class="note">
+        Signatures électroniques recueillies sur l’espace formation d’Expernet pendant le cours.
+        L’heure est celle du serveur. Chaque émargement est scellé (HMAC-SHA256) :
+        « Vérifié » indique qu’il n’a pas été modifié depuis sa signature.
+    </p>
+</body>
+</html>

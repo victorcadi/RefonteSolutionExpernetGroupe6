@@ -1,0 +1,34 @@
+{# Récapitulatif d'un cours : date, horaires, intitulé, formateur et salle. #}
+<dl class="recap-creneau mb-0">
+    <div>
+        <dt>Cours</dt>
+        <dd>{{ creneau.intitule }}</dd>
+    </div>
+    <div>
+        <dt>Date</dt>
+        <dd><time datetime="{{ creneau.debut|date('Y-m-d') }}">{{ creneau.debut|format_date('full', locale: 'fr')|capitalize }}</time></dd>
+    </div>
+    <div>
+        <dt>Horaires</dt>
+        <dd>
+            <time datetime="{{ creneau.debut|date('c') }}">{{ creneau.debut|date('H:i') }}</time>
+            – <time datetime="{{ creneau.fin|date('c') }}">{{ creneau.fin|date('H:i') }}</time>
+        </dd>
+    </div>
+    <div>
+        <dt>Promotion</dt>
+        <dd>{{ creneau.promotion.nom }}</dd>
+    </div>
+    {% if creneau.formateur %}
+        <div>
+            <dt>Formateur</dt>
+            <dd>{{ creneau.formateur.nomComplet }}</dd>
+        </div>
+    {% endif %}
+    {% if creneau.salle %}
+        <div>
+            <dt>Salle</dt>
+            <dd>{{ creneau.salle }}</dd>
+        </div>
+    {% endif %}
+</dl>

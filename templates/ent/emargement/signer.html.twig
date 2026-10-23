@@ -1,0 +1,70 @@
+{% extends 'ent/_base.html.twig' %}
+
+{# Après un envoi réussi, la page redirige : un formulaire soumis affiché ici contient donc une erreur. #}
+{% block title %}{{ form.vars.submitted ? 'Erreur – ' : '' }}Signer l’émargement{% endblock %}
+
+{% block contenu %}
+    <div class="row g-4 g-lg-5">
+        <div class="col-lg-7">
+            <h1>Signer l’émargement</h1>
+
+            <section class="encart h-auto mb-4" aria-labelledby="titre-cours">
+                <h2 id="titre-cours" class="h5">Cours concerné</h2>
+                {{ include('ent/emargement/_creneau.html.twig') }}
+            </section>
+
+            {{ include('demande/_erreurs.html.twig') }}
+
+            {{ form_start(form, {attr: {
+                'aria-label': 'Signature de l’émargement',
+                'data-controller': 'signature',
+                'data-action': 'submit->signature#envoyer',
+            }}) }}
+                {# Choix du mode et tracé : affichés par le script de la page. #}
+                <div data-signature-target="choix" hidden>
+                    {{ form_row(form.mode) }}
+                </div>
+
+                <div class="mb-4" data-signature-target="panneauTrace" hidden>
+                    <p class="mb-2" id="consigne-trace">
+                        Tracez votre signature dans le cadre, au doigt, au stylet ou à la souris.
+                        Si vous ne pouvez pas tracer, choisissez « Saisir mon prénom et mon nom ».
+                    </p>
+                    <div id="{{ form.signature.vars.id }}" class="zone-signature" tabindex="-1">
+                        <canvas data-signature-target="canvas"
+                                data-action="pointerdown->signature#commencer pointermove->signature#tracer pointerup->signature#terminer pointercancel->signature#terminer"
+                                role="img" aria-label="Cadre de signature" aria-describedby="consigne-trace"></canvas>
+                    </div>
+                    {{ form_errors(form.signature) }}
+                    <p class="visually-hidden" aria-live="polite" data-signature-target="etat"></p>
+                    <button type="button" class="btn btn-expernet-secondary btn-sm mt-2" data-action="signature#effacer">
+                        {{ icone('eraser') }} Effacer la signature
+                    </button>
+                    {{ form_widget(form.signature, {id: 'signature_donnees'}) }}
+                </div>
+
+                <div data-signature-target="panneauSaisie">
+                    {{ form_row(form.nom) }}
+                </div>
+
+                {{ form_row(form.certification) }}
+
+                <button type="submit" class="btn btn-expernet-primary">{{ icone('vector-pen') }} Signer l’émargement</button>
+            {{ form_end(form) }}
+        </div>
+
+        <aside class="col-lg-5" aria-labelledby="titre-aide-emargement">
+            <div class="encart section-claire h-auto">
+                <h2 id="titre-aide-emargement" class="h5 fw-bold">Comment fonctionne l’émargement ?</h2>
+                <ul class="mb-0">
+                    <li>Vous signez pendant le cours, entre l’heure de début et l’heure de fin.</li>
+                    <li>L’heure enregistrée est celle du serveur d’Expernet, pas celle de votre appareil.</li>
+                    <li>Chaque signature est scellée : toute modification ultérieure est détectée.</li>
+                    <li>Une fois signée, la présence ne peut plus être modifiée par vous. En cas d’erreur, prévenez votre formateur.</li>
+                    <li>Vos émargements servent à établir vos <a href="{{ path('app_ent_attestations') }}">attestations de présence</a>
+                        (voir la <a href="{{ path('app_confidentialite') }}">politique de confidentialité</a>).</li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+{% endblock %}

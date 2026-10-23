@@ -74,4 +74,40 @@ class CreneauRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * Créneaux animés par un formateur entre deux instants, avec leur promotion.
+     *
+     * @return list<Creneau>
+     */
+    public function findPourFormateurEntre(Utilisateur $formateur, \DateTimeImmutable $debut, \DateTimeImmutable $fin): array
+    {
+        return $this->createQueryBuilder('c')
+            ->addSelect('p')
+            ->join('c.promotion', 'p')
+            ->andWhere('c.formateur = :formateur')
+            ->andWhere('c.fin > :debut')
+            ->andWhere('c.debut < :fin')
+            ->setParameter('formateur', $formateur)
+            ->setParameter('debut', $debut)
+            ->setParameter('fin', $fin)
+            ->orderBy('c.debut', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Premier jour de cours d'une promotion (pour proposer les attestations mensuelles).
+     */
+    public function findPremierDebutPourPromotion(Promotion $promotion): ?\DateTimeImmutable
+    {
+        $debut = $this->createQueryBuilder('c')
+            ->select('MIN(c.debut)')
+            ->andWhere('c.promotion = :promotion')
+            ->setParameter('promotion', $promotion)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return null === $debut ? null : new \DateTimeImmutable($debut);
+    }
 }

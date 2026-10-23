@@ -9,6 +9,7 @@
         <section class="col-lg-7" aria-labelledby="titre-cours">
             <div class="encart">
                 <h2 id="titre-cours" class="h4">Mes prochains cours</h2>
+                <p class="small"><a href="{{ path('app_ent_planning_formateur') }}">{{ icone('calendar-week') }} Voir mon planning</a></p>
                 {% if creneaux is empty %}
                     <p class="mb-0">Aucun cours programmé.</p>
                 {% else %}
@@ -20,7 +21,12 @@
                                     {{ creneau.debut|date('H:i') }} – {{ creneau.fin|date('H:i') }}
                                     {% if creneau.debut <= maintenant and creneau.fin > maintenant %}<span class="badge-expernet badge-expernet--succes ms-1">En cours</span>{% endif %}
                                 </p>
-                                <p class="mb-0 small">{{ creneau.intitule }} · {{ creneau.promotion.nom }}{{ creneau.salle ? ' · ' ~ creneau.salle : '' }}</p>
+                                <p class="mb-1 small">{{ creneau.intitule }} · {{ creneau.promotion.nom }}{{ creneau.salle ? ' · ' ~ creneau.salle : '' }}</p>
+                                <p class="mb-0 small">
+                                    <a href="{{ path('app_ent_feuille_emargement', {id: creneau.id}) }}">
+                                        {{ icone('clipboard-check') }} Feuille d’émargement<span class="visually-hidden"> du cours {{ creneau.intitule }} du {{ creneau.debut|format_datetime('long', 'short', locale: 'fr') }}</span>
+                                    </a>
+                                </p>
                             </li>
                         {% endfor %}
                     </ul>

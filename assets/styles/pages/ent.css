@@ -67,3 +67,75 @@
     grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
     gap: 1rem;
 }
+
+/* Récapitulatif d'un cours (signature, feuille d'émargement) */
+.recap-creneau {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: .75rem 1.5rem;
+}
+
+.recap-creneau dt {
+    color: var(--expernet-text-muted);
+    font-size: var(--expernet-texte-petit);
+    font-weight: 700;
+}
+
+.recap-creneau dd {
+    margin: 0;
+}
+
+/* Planning hebdomadaire */
+.navigation-semaine {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.planning-semaine {
+    display: grid;
+    gap: 1rem;
+}
+
+.planning-jour {
+    padding: 1.25rem 1.5rem;
+    background: var(--expernet-surface);
+    border-left: 4px solid var(--expernet-border-strong);
+    border-radius: var(--expernet-radius);
+    box-shadow: var(--expernet-shadow-sm);
+}
+
+.planning-jour--aujourdhui {
+    border-left-color: var(--expernet-primary);
+}
+
+/* Zone de signature : fond blanc dans les deux thèmes pour un tracé lisible */
+.zone-signature {
+    max-width: 36rem;
+    border: 2px dashed var(--expernet-border-strong);
+    border-radius: var(--expernet-radius-sm);
+    background: var(--expernet-blanc);
+}
+
+.zone-signature:focus-visible {
+    outline: 3px solid var(--expernet-focus);
+    outline-offset: 2px;
+}
+
+.zone-signature canvas {
+    display: block;
+    width: 100%;
+    height: 11rem;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.signature-miniature {
+    width: 150px;
+    height: 50px;
+    object-fit: contain;
+    background: var(--expernet-blanc);
+    border-radius: var(--expernet-radius-sm);
+}

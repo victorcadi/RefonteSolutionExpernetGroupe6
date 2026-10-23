@@ -36,6 +36,10 @@
                                     <p class="mb-0 mt-1">
                                         {% if signe %}
                                             <span class="badge-expernet badge-expernet--succes">{{ icone('check-circle-fill') }} Émargement signé</span>
+                                        {% elseif creneau.estOuvertALaSignature(maintenant) %}
+                                            <a class="btn btn-expernet-primary btn-sm" href="{{ path('app_ent_emargement_signer', {id: creneau.id}) }}">
+                                                {{ icone('vector-pen') }} Signer l’émargement<span class="visually-hidden"> du cours {{ creneau.intitule }}</span>
+                                            </a>
                                         {% elseif creneau.fin < maintenant %}
                                             <span class="badge-expernet badge-expernet--alerte">{{ icone('exclamation-triangle-fill') }} Non signé</span>
                                         {% else %}
@@ -72,6 +76,7 @@
             <section class="col-lg-6" aria-labelledby="titre-prochains">
                 <div class="encart">
                     <h2 id="titre-prochains" class="h4">Prochains cours</h2>
+                    <p class="small"><a href="{{ path('app_ent_planning_etudiant') }}">{{ icone('calendar-week') }} Voir le planning complet</a></p>
                     {% if prochains is empty %}
                         <p class="mb-0">Aucun cours programmé dans les deux prochaines semaines.</p>
                     {% else %}

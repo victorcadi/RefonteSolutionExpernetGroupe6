@@ -1,0 +1,26 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% block title %}Émargement indisponible{% endblock %}
+
+{% block contenu %}
+    <div class="row">
+        <div class="col-lg-8">
+            <h1>Émargement indisponible</h1>
+
+            <div class="alert {{ refus.raison == constant('App\\Service\\Emargement\\EmargementImpossible::DEJA_SIGNE') ? 'alert-success' : 'alert-info' }}" role="status">
+                {{ icone(refus.raison == constant('App\\Service\\Emargement\\EmargementImpossible::DEJA_SIGNE') ? 'check-circle-fill' : 'info-circle-fill') }}
+                <div>{{ refus.message }}</div>
+            </div>
+
+            <section class="encart h-auto mb-4" aria-labelledby="titre-cours">
+                <h2 id="titre-cours" class="h5">Cours concerné</h2>
+                {{ include('ent/emargement/_creneau.html.twig') }}
+            </section>
+
+            <p class="d-flex flex-wrap gap-2">
+                <a class="btn btn-expernet-primary" href="{{ path('app_ent_etudiant') }}">{{ icone('house-door-fill') }} Mon tableau de bord</a>
+                <a class="btn btn-expernet-secondary" href="{{ path('app_ent_planning_etudiant', {semaine: creneau.debut|date('o-\\WW')}) }}">{{ icone('calendar-week') }} Planning de la semaine</a>
+            </p>
+        </div>
+    </div>
+{% endblock %}

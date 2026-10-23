@@ -14,10 +14,17 @@
         {% set liens = liens|merge([{route: 'app_ent_admin', libelle: 'Administration', icone: 'shield-lock-fill'}]) %}
     {% endif %}
     {% if is_granted('ROLE_FORMATEUR') %}
-        {% set liens = liens|merge([{route: 'app_ent_formateur', libelle: 'Mes promotions', icone: 'person-workspace'}]) %}
+        {% set liens = liens|merge([
+            {route: 'app_ent_formateur', libelle: 'Mes promotions', icone: 'person-workspace'},
+            {route: 'app_ent_planning_formateur', libelle: 'Mon planning', icone: 'calendar-week'},
+        ]) %}
     {% endif %}
     {% if is_granted('ROLE_ETUDIANT') %}
-        {% set liens = liens|merge([{route: 'app_ent_etudiant', libelle: 'Mon tableau de bord', icone: 'house-door-fill'}]) %}
+        {% set liens = liens|merge([
+            {route: 'app_ent_etudiant', libelle: 'Mon tableau de bord', icone: 'house-door-fill'},
+            {route: 'app_ent_planning_etudiant', libelle: 'Mon planning', icone: 'calendar-week'},
+            {route: 'app_ent_attestations', libelle: 'Mes attestations', icone: 'file-earmark-text'},
+        ]) %}
     {% endif %}
     {% set liens = liens|merge([{route: 'app_ent_double_authentification', libelle: 'Sécurité du compte', icone: 'shield-lock-fill'}]) %}
 

@@ -1,0 +1,75 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% set route_planning = vue == 'etudiant' ? 'app_ent_planning_etudiant' : 'app_ent_planning_formateur' %}
+{% set libelle_semaine = 'Semaine du ' ~ semaine.lundi|format_date('long', locale: 'fr') ~ ' au ' ~ semaine.dimanche|format_date('long', locale: 'fr') %}
+
+{% block title %}Mon planning – {{ libelle_semaine }}{% endblock %}
+
+{% block contenu %}
+    <h1>Mon planning</h1>
+    {% if vue == 'etudiant' and promotion %}
+        <p class="texte-intro">{{ promotion.nom }}{% if promotion.formation %} – {{ promotion.formation.intitule }}{% endif %}</p>
+    {% elseif vue == 'formateur' %}
+        <p class="texte-intro">Les cours que vous animez.</p>
+    {% endif %}
+
+    {% if vue == 'etudiant' and promotion is null %}
+        <div class="alert alert-info" role="status">
+            {{ icone('info-circle-fill') }}
+            <div>Vous n’êtes rattaché(e) à aucune promotion pour le moment : aucun cours à afficher.</div>
+        </div>
+    {% else %}
+        <nav class="navigation-semaine" aria-label="Changer de semaine">
+            <a class="btn btn-expernet-secondary btn-sm" href="{{ path(route_planning, {semaine: semaine.precedente.code}) }}">
+                {{ icone('chevron-left') }} Semaine précédente
+            </a>
+            <h2 class="h4 mb-0 text-center">{{ libelle_semaine }}</h2>
+            <a class="btn btn-expernet-secondary btn-sm" href="{{ path(route_planning, {semaine: semaine.suivante.code}) }}">
+                Semaine suivante {{ icone('chevron-right') }}
+            </a>
+        </nav>
+        {% if not semaine.contient(maintenant) %}
+            <p class="text-center mt-2 mb-0"><a href="{{ path(route_planning) }}">Revenir à la semaine en cours</a></p>
+        {% endif %}
+
+        <div class="planning-semaine mt-4">
+            {% for jour in semaine.jours %}
+                {% set cours_du_jour = creneaux|filter(c => c.debut|date('Y-m-d') == jour|date('Y-m-d')) %}
+                {% set aujourdhui = jour|date('Y-m-d') == maintenant|date('Y-m-d') %}
+                {# Samedi et dimanche ne sont affichés que s'ils comportent des cours. #}
+                {% if cours_du_jour is not empty or jour|date('N') < 6 %}
+                    <section class="planning-jour{{ aujourdhui ? ' planning-jour--aujourdhui' : '' }}" aria-labelledby="jour-{{ jour|date('Y-m-d') }}">
+                        <h3 id="jour-{{ jour|date('Y-m-d') }}" class="h5">
+                            <time datetime="{{ jour|date('Y-m-d') }}">{{ jour|format_date('full', locale: 'fr')|capitalize }}</time>
+                            {% if aujourdhui %}<span class="badge-expernet ms-1">Aujourd’hui</span>{% endif %}
+                        </h3>
+                        {% if cours_du_jour is empty %}
+                            <p class="mb-0 small">Pas de cours.</p>
+                        {% else %}
+                            <ul class="liste-sans-puce liste-creneaux mb-0">
+                                {% for creneau in cours_du_jour %}
+                                    <li>
+                                        <p class="mb-1 fw-bold">
+                                            <time datetime="{{ creneau.debut|date('c') }}">{{ creneau.debut|date('H:i') }}</time>
+                                            – <time datetime="{{ creneau.fin|date('c') }}">{{ creneau.fin|date('H:i') }}</time>
+                                            · {{ creneau.intitule }}
+                                        </p>
+                                        <p class="mb-2 small">
+                                            {%- if vue == 'etudiant' -%}
+                                                {{ creneau.formateur ? 'Avec ' ~ creneau.formateur.nomComplet : 'Formateur à confirmer' }}
+                                            {%- else -%}
+                                                {{ creneau.promotion.nom }}
+                                            {%- endif -%}
+                                            {{ creneau.salle ? ' · ' ~ creneau.salle : '' }}
+                                        </p>
+                                        {{ include('ent/planning/_etat_creneau.html.twig') }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </section>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

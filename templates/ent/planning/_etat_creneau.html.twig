@@ -1,0 +1,26 @@
+{#
+    État d'un cours et action possible.
+    Étudiant : signer pendant le cours, ou état de l'émargement. Formateur : accès à la feuille.
+    Variables : creneau, vue, signes, maintenant.
+#}
+{% set en_cours = creneau.estOuvertALaSignature(maintenant) %}
+{% if vue == 'etudiant' %}
+    {% if signes[creneau.id] ?? false %}
+        <span class="badge-expernet badge-expernet--succes">{{ icone('check-circle-fill') }} Émargement signé</span>
+    {% elseif en_cours %}
+        <a class="btn btn-expernet-primary btn-sm" href="{{ path('app_ent_emargement_signer', {id: creneau.id}) }}">
+            {{ icone('vector-pen') }} Signer l’émargement<span class="visually-hidden"> du cours {{ creneau.intitule }}</span>
+        </a>
+    {% elseif creneau.fin < maintenant %}
+        <span class="badge-expernet badge-expernet--alerte">{{ icone('exclamation-triangle-fill') }} Non signé</span>
+    {% else %}
+        <span class="badge-expernet">Émargement à signer pendant le cours</span>
+    {% endif %}
+{% else %}
+    <p class="mb-0 d-flex flex-wrap align-items-center gap-2">
+        {% if en_cours %}<span class="badge-expernet badge-expernet--succes">En cours</span>{% endif %}
+        <a href="{{ path('app_ent_feuille_emargement', {id: creneau.id}) }}">
+            {{ icone('clipboard-check') }} Feuille d’émargement<span class="visually-hidden"> du cours {{ creneau.intitule }} du {{ creneau.debut|format_datetime('long', 'short', locale: 'fr') }}</span>
+        </a>
+    </p>
+{% endif %}

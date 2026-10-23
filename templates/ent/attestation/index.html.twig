@@ -1,0 +1,48 @@
+{% extends 'ent/_base.html.twig' %}
+
+{% block title %}Mes attestations de présence{% endblock %}
+
+{% block contenu %}
+    <div class="row g-4 g-lg-5">
+        <div class="col-lg-7">
+            <h1>Mes attestations de présence</h1>
+            <p class="texte-intro texte-lecture">
+                Une attestation par mois, établie à partir de vos émargements :
+                elle liste les cours terminés, signés ou non, et le temps de présence.
+            </p>
+
+            {% if mois is empty %}
+                <div class="alert alert-info" role="status">
+                    {{ icone('info-circle-fill') }}
+                    <div>Aucun cours n’a encore eu lieu : aucune attestation disponible.</div>
+                </div>
+            {% else %}
+                <ul class="liste-sans-puce liste-creneaux encart h-auto">
+                    {% for premier_jour in mois %}
+                        {% set libelle = premier_jour|format_date(pattern: 'MMMM y', locale: 'fr')|capitalize %}
+                        <li class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                            <span class="fw-bold">
+                                {{ libelle }}
+                                {% if loop.first %}<span class="badge-expernet ms-1">Mois en cours</span>{% endif %}
+                            </span>
+                            <a class="btn btn-expernet-secondary btn-sm" href="{{ path('app_ent_attestation_pdf', {mois: premier_jour|date('Y-m')}) }}">
+                                {{ icone('file-earmark-pdf-fill') }} Télécharger<span class="visually-hidden"> l’attestation de {{ libelle }}</span> (PDF)
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <aside class="col-lg-5" aria-labelledby="titre-aide-attestation">
+            <div class="encart section-claire h-auto">
+                <h2 id="titre-aide-attestation" class="h5 fw-bold">À quoi sert cette attestation ?</h2>
+                <p>Elle permet de justifier votre assiduité, par exemple auprès de votre employeur ou du financeur de votre formation.</p>
+                <p class="mb-0">
+                    Pour le mois en cours, elle s’arrête aux cours déjà terminés.
+                    Si un émargement vous semble manquant, contactez votre formateur référent.
+                </p>
+            </div>
+        </aside>
+    </div>
+{% endblock %}

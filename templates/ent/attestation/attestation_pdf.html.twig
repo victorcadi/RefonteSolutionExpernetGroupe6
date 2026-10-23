@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    {% set libelle_mois = mois|format_date(pattern: 'MMMM y', locale: 'fr') %}
+    <title>Attestation de présence – {{ etudiant.nomComplet }} – {{ libelle_mois }}</title>
+    {# Styles internes : dompdf n'accède pas aux feuilles de style du site. #}
+    <style>
+        @page { margin: 20mm 18mm 24mm; }
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 10pt; color: #1B1B1B; line-height: 1.45; }
+        h1 { font-size: 18pt; color: #0071A3; margin: 0 0 3mm; }
+        .entete { border-bottom: 3pt solid #ED8F00; padding-bottom: 3mm; margin-bottom: 6mm; }
+        .organisme { font-size: 8.5pt; color: #5C6670; }
+        table.cours { width: 100%; border-collapse: collapse; margin-top: 4mm; }
+        .cours th { background: #0F3A4B; color: #FFFFFF; text-align: left; padding: 1.8mm 2mm; font-size: 9pt; }
+        .cours td { padding: 1.4mm 2mm; border-bottom: .5pt solid #D5DCE1; }
+        .absent { color: #A4262C; font-weight: bold; }
+        .bilan { margin-top: 5mm; padding: 3mm; background: #EEF7FB; }
+        .alerte { color: #A4262C; font-weight: bold; }
+        .demo { background: #FFF4D6; color: #8A5A00; padding: 2mm 3mm; margin-bottom: 4mm; font-size: 9pt; }
+        .note { font-size: 8pt; color: #5C6670; margin-top: 6mm; }
+        .pied { position: fixed; bottom: -15mm; left: 0; right: 0; font-size: 7.5pt; color: #5C6670; text-align: center; }
+    </style>
+</head>
+<body>
+    {% set ml = expernet.mentions_legales %}
+    <div class="pied">
+        {{ ml.raison_sociale }} – {{ ml.siege }} – SIRET {{ ml.siret }}
+        – N° de déclaration d’activité {{ ml.declaration_activite }} – Document généré le {{ genere_le|date('d/m/Y à H:i') }}
+    </div>
+
+    <div class="entete">
+        <div class="organisme">{{ ml.raison_sociale }} – {{ expernet.accroche }}</div>
+        <h1>Attestation de présence – {{ libelle_mois|capitalize }}</h1>
+    </div>
+
+    {% if expernet_demo %}
+        <div class="demo">Document de démonstration : les personnes et les cours sont fictifs.</div>
+    {% endif %}
+
+    <p>
+        L’organisme de formation {{ ml.raison_sociale }} atteste que <strong>{{ etudiant.nomComplet }}</strong>,
+        inscrit(e) dans la promotion « {{ promotion.nom }} »{% if promotion.formation %} ({{ promotion.formation.intitule }}){% endif %},
+        a émargé les cours suivants en {{ libelle_mois }}{{ genere_le|date('Y-m') == mois|date('Y-m') ? ', jusqu’au ' ~ genere_le|format_date('long', locale: 'fr') : '' }}.
+    </p>
+
+    {% if lignes is empty %}
+        <p>Aucun cours terminé sur cette période.</p>
+    {% else %}
+        <table class="cours">
+            <thead>
+                <tr><th>Date</th><th>Horaires</th><th>Cours</th><th>Durée</th><th>Présence</th></tr>
+            </thead>
+            <tbody>
+                {% for ligne in lignes %}
+                    {% set creneau = ligne.creneau %}
+                    <tr>
+                        <td>{{ creneau.debut|date('d/m/Y') }}</td>
+                        <td>{{ creneau.debut|date('H:i') }} – {{ creneau.fin|date('H:i') }}</td>
+                        <td>{{ creneau.intitule }}</td>
+                        <td>{{ (creneau.dureeMinutes // 60) }} h {{ '%02d'|format(creneau.dureeMinutes % 60) }}</td>
+                        <td>
+                            {% if ligne.emargement %}Présent(e) – signé à {{ ligne.emargement.signeLe|date('H:i') }}{% else %}<span class="absent">Absent(e)</span>{% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="bilan">
+            <strong>{{ presences }} cours émargé{{ presences > 1 ? 's' : '' }} sur {{ lignes|length }}</strong>,
+            soit {{ minutes_presence // 60 }} h {{ '%02d'|format(minutes_presence % 60) }} de présence.
+            {% if not tout_integre %}
+                <br><span class="alerte">Attention : au moins un émargement a été modifié après sa signature. Cette attestation doit être vérifiée par l’organisme.</span>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <p class="note">
+        Attestation établie automatiquement à partir des émargements électroniques signés par l’apprenant
+        sur l’espace formation d’Expernet pendant chaque cours. Chaque émargement est horodaté par le serveur
+        et scellé (HMAC-SHA256){% if tout_integre and lignes is not empty %} ; tous les sceaux ont été vérifiés lors de la génération{% endif %}.
+        Ce document ne porte pas de signature manuscrite de l’organisme.
+    </p>
+</body>
+</html>
