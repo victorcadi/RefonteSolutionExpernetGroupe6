@@ -116,8 +116,8 @@
 }
 
 .carte--alternance .carte-visuel {
-    background: lightblue;
-    color: var(--expernet-petrole);
+    background: var(--expernet-surface-blue);
+    color: var(--expernet-primary-darker);
 }
 
 .carte-badge {

@@ -89,7 +89,7 @@
 
 /* Sous-navigation de l'ENT (rose clair de la maquette) */
 .ent-nav {
-    background: var(--expernet-surface-rose);
+    background: var(--expernet-surface-blue);
     border-bottom: 1px solid var(--expernet-border);
 }
 
