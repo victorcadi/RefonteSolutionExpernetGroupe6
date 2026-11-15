@@ -116,7 +116,7 @@
 }
 
 .carte--alternance .carte-visuel {
-    background: var(--expernet-surface-rose);
+    background: lightblue;
     color: var(--expernet-petrole);
 }
 
